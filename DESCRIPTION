@@ -1,15 +1,15 @@
 Package: RTNsurvival
 Type: Package
 Title: Survival analysis using transcriptional networks inferred by the RTN package
-Version: 0.2.0
+Version: 0.2.1
 Author: Clarice S. Groeneveld, Vinicius S. Chagas, Kerstin B. Meyer, Mauro A. A. Castro
 Maintainer: Clarice Groeneveld <clari.groeneveld@gmail.com>
 Depends: R (>= 3.3), methods, RTN
 Imports: survival, RColorBrewer, grDevices, graphics, stats
-Suggests: Fletcher2013b, knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics
+Suggests: Fletcher2013b, pheatmap, knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics
 Description: This package provides classes and methods to perform survival analysis using transcriptional networks inferred by the RTN package, including Kaplan-Meier and multivariate survival analysis using Cox's regression model.
 License: Artistic-2.0
 biocViews: NetworkEnrichment, Survival, GeneRegulation, GeneSetEnrichment, Regression, Preprocessing, Network, BiocViews, GeneExpression, GeneticVariability, NetworkInference, GraphAndNetwork, Preprocessing, Network
 LazyData: TRUE
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
