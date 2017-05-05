@@ -2,32 +2,35 @@
 % Please edit documentation in R/AllClasses.R
 \docType{class}
 \name{TNS-class}
-\alias{TNS}
 \alias{TNS-class}
-\title{TNS: An S4 class for survival survival analysis using transcriptional networks inferred by the RTN package.}
+\alias{TNS}
+\title{TNS: An S4 class for survival survival analysis using transcriptional 
+networks inferred by the RTN package.}
 \description{
-TNS: An S4 class for survival survival analysis using transcriptional networks inferred by the RTN package.
+TNS: An S4 class for survival survival analysis using transcriptional 
+networks inferred by the RTN package.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{survivalData}}{a data frame containing the survival data for all samples. Samples
-must be in the rows and the survival variables in the columns. Time of last update and
-event in last update (0 for alive, 1 for deceased).}
+\item{\code{survivalData}}{a data frame containing the survival data for all samples. 
+Samples must be in the rows and the survival variables in the columns. 
+Time of last update and event in last update (0 for alive, 1 for deceased).}
 
-\item{\code{EScores}}{a list created by tnsGSEA2, containing the enrichment scores for all
-samples}
+\item{\code{EScores}}{a list created by tnsGSEA2, containing the enrichment scores 
+for all samples}
 
-\item{\code{keycovar}}{a string vector containing the key covariables used to compute the
-Cox regression. They must be present in the survivalData table.}
+\item{\code{keycovar}}{a string vector containing the key covariables used to 
+compute the Cox regression. They must be present in the survivalData table.}
 
-\item{\code{tni}}{a \linkS4class{TNI}-class object, previously computed. It is added to the TNS
-via tnsGSEA2}
+\item{\code{tni}}{a \linkS4class{TNI}-class object, previously computed. It is added 
+to the TNS via tnsGSEA2}
 
 \item{\code{status}}{a vector containing the processing status of the TNS object.}
 
 \item{\code{para}}{a list with the parameters used to compute the GSEA2 analysis.}
 }}
+
 \section{Constructor}{
 
 

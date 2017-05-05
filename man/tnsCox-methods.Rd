@@ -2,8 +2,8 @@
 % Please edit documentation in R/AllMethods.R
 \docType{methods}
 \name{tnsCox,TNS-method}
-\alias{tnsCox}
 \alias{tnsCox,TNS-method}
+\alias{tnsCox}
 \title{Cox regression analysis for TNS class objects.}
 \usage{
 \S4method{tnsCox}{TNS}(tns, regs = NULL, endpoint = 60, fname = "coxplot",
@@ -15,8 +15,8 @@
 \arguments{
 \item{tns}{a \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
 
-\item{regs}{a string vector. Contains the regulons which will be used to compute
-the Cox multivariate model. If left NULL, all regulons will be used.}
+\item{regs}{a string vector. Contains the regulons which will be used to 
+compute the Cox multivariate model. If left NULL, all regulons will be used.}
 
 \item{endpoint}{a numeric value. The final point in time for the samples. All
 time values larger than endpoint will be set at endpoint.}
@@ -29,8 +29,8 @@ time values larger than endpoint will be set at endpoint.}
 
 \item{xlab}{a string. The label of the x-axis.}
 
-\item{qqkeycovar}{a logical value. If TRUE, only the samples in the 2nd and 3rd
-quarters of dES are used to compute. If FALSE, all samples are used.}
+\item{qqkeycovar}{a logical value. If TRUE, only the samples in the 2nd and 
+3rd quarters of dES are used to compute. If FALSE, all samples are used.}
 
 \item{excludeMid}{a logical value. If TRUE, inconclusive dES values will not be
 consired in the survival analysis.}
@@ -42,8 +42,8 @@ consired in the survival analysis.}
 \item{xlim}{a vector with 2 values. The first value represents the lowest
 value in the x-axis, the second value is the highest.}
 
-\item{sortregs}{a logical value. If TRUE, regulons are sorted from most negatively
-associated with hazard to most positively associated with hazard.}
+\item{sortregs}{a logical value. If TRUE, regulons are sorted from most 
+negatively associated with hazard to most positively associated with hazard.}
 
 \item{plotpdf}{a logical value.}
 }
@@ -58,14 +58,16 @@ data(dt4rtn, package="RTN")
 data(survival.data)
 
 # compute regulons for 3 TFs using the RTN package
-rtni <- new("TNI", gexp=dt4rtn$gexp, transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
+rtni <- new("TNI", gexp=dt4rtn$gexp, 
+transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
 rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
 rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=1000
 rtni<-tni.dpi.filter(rtni, verbose=FALSE)
 
-rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), time = 1, event = 2)
+rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
+time = 1, event = 2)
 rtns <- tnsGSEA2(rtns, verbose=FALSE)
-tnsCox(rtns, regs = c("PTTG1","E2F2","FOXM1"), sortregs = TRUE, plotpdf = FALSE)
+tnsCox(rtns, regs = c("PTTG1","E2F2","FOXM1"), sortregs = TRUE, 
+plotpdf = FALSE)
 
 }
-

@@ -2,8 +2,8 @@
 % Please edit documentation in R/AllMethods.R
 \docType{methods}
 \name{tnsGSEA2,TNS-method}
-\alias{tnsGSEA2}
 \alias{tnsGSEA2,TNS-method}
+\alias{tnsGSEA2}
 \title{2-tailed Gene Set Enrichment Analysis on Transcriptional Networks.}
 \usage{
 \S4method{tnsGSEA2}{TNS}(tns, ...)
@@ -11,22 +11,24 @@
 \arguments{
 \item{tns}{A \linkS4class{TNS} class, which has been preprocessed}
 
-\item{...}{Parameters passed to the \code{\link[RTN:tni.gsea2]{tni.gsea2}} function.}
+\item{...}{Parameters passed to the \code{\link[RTN:tni.gsea2]{tni.gsea2}} 
+function.}
 }
 \value{
 A \linkS4class{TNS} class, with added Enrichment Scores.
 }
 \description{
-Works as a wrapper for \code{\link[RTN:tni.gsea2]{tni.gsea2}}, performing a 2-tailed GSEA
-analysis on a \linkS4class{TNI} class object and integrating the results into 
-the \linkS4class{TNS} class object.
+Works as a wrapper for \code{\link[RTN:tni.gsea2]{tni.gsea2}}, performing a 
+2-tailed GSEA analysis on a \linkS4class{TNI} class object and integrating 
+the results into the \linkS4class{TNS} class object.
 }
 \examples{
 data(dt4rtn, package="RTN")
 data(survival.data)
 
 # compute regulons for 3 TFs using the RTN package
-rtni <- new("TNI", gexp=dt4rtn$gexp, transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
+rtni <- new("TNI", gexp=dt4rtn$gexp, 
+transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
 rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
 rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=1000
 rtni<-tni.dpi.filter(rtni, verbose=FALSE)
@@ -36,6 +38,6 @@ rtns <- tnsGSEA2(rtns, verbose=FALSE)
 
 }
 \seealso{
-\code{\link[RTN:tni.gsea2]{tni.gsea2}} for information on all parameters.
+\code{\link[RTN:tni.gsea2]{tni.gsea2}} for information on all 
+parameters.
 }
-

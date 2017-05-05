@@ -11,24 +11,30 @@ tnsPlotGSEA2(object, aSample, regs = NULL, refsamp = NULL, log = FALSE,
 \arguments{
 \item{object}{a TNS object}
 
-\item{aSample}{a string specifying a given sample number present in the 'survivalData' table.}
+\item{aSample}{a string specifying a given sample number present in the 
+'survivalData' table.}
 
 \item{regs}{an optional string vector specifying regulons to make the plot.}
 
 \item{refsamp}{a character vector.}
 
-\item{log}{a logical value. If TRUE, gexp values are transformed into log space.}
+\item{log}{a logical value. If TRUE, gexp values are transformed into log 
+space.}
 
-\item{ntop}{an optional integer value. The number of regulons for which the GSEA2 will be plotted.}
+\item{ntop}{an optional integer value. The number of regulons for which the 
+GSEA2 will be plotted.}
 
 \item{pValueCutoff}{an integer. The p cutoff value for the analysis.}
 
-\item{pAdjustMethod}{a character. Specifies the adjustment method for the pvalue.
+\item{pAdjustMethod}{a character. Specifies the adjustment method for the 
+pvalue.
 See \code{\link[stats:p.adjust]{p.adjust}}}
 
-\item{verbose}{a logical value. If TRUE, prints status of function while executing.}
+\item{verbose}{a logical value. If TRUE, prints status of function while 
+executing.}
 
-\item{...}{parameters which will be passed to \code{\link[RTN:tna.plot.gsea2]{tna.plot.gsea2}},
+\item{...}{parameters which will be passed to 
+\code{\link[RTN:tna.plot.gsea2]{tna.plot.gsea2}},
 such as ylimPanels, heightPanels, width, height, ylabPanels, xlab...}
 }
 \value{
@@ -43,12 +49,14 @@ data(dt4rtn, package="RTN")
 data(survival.data)
 
 # compute regulons for 3 TFs using the RTN package
-rtni <- new("TNI", gexp=dt4rtn$gexp, transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
+rtni <- new("TNI", gexp=dt4rtn$gexp, 
+transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
 rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
-rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=1000
+rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=100
 rtni<-tni.dpi.filter(rtni, verbose=FALSE)
 
-rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), time = 1, event = 2)
+rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
+time = 1, event = 2)
 rtns <- tnsGSEA2(rtns, verbose=FALSE)
 tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1")
 
@@ -56,4 +64,3 @@ tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1")
 \seealso{
 \code{\link[RTN:tna.plot.gsea2]{tna.plot.gsea2}} for all plot parameters
 }
-
