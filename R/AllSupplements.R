@@ -31,7 +31,7 @@
 #' rtni <- new("TNI", gexp=dt4rtn$gexp, 
 #' transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
 #' rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
-#' rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=1000
+#' rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=100
 #' rtni<-tni.dpi.filter(rtni, verbose=FALSE)
 #'
 #' rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
@@ -450,7 +450,35 @@ tns.set <- function(object, para = NULL, what)
     
 }
 
-tns.get <- function (object, para = NULL, what)
+#' Get information from slots in a TNS object
+#'
+#'Get information from individual slots in a TNS object and 
+#'any available results from a previous analysis.
+#'
+#' @param object a TNS object
+#' @param what a character vector specifying what should be retrieved from the
+#' object. Options: "survivalData", "EScores", "TNI", "keycovar"
+#' 
+#' @return A plot containing the 2-tailed GSEA analysis for a phenotype.
+#' @examples
+#' data(dt4rtn, package="RTN")
+#' data(survival.data)
+#' 
+#' # retrieve the Enrichment Score results
+#' rtni <- new("TNI", gexp=dt4rtn$gexp, 
+#' transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
+#' rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
+#' rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=100
+#' rtni<-tni.dpi.filter(rtni, verbose=FALSE)
+#'
+#' rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
+#' time = 1, event = 2)
+#' rtns <- tnsGSEA2(rtns, verbose=FALSE)
+#' enrichmentScores <- tnsGet(rtns, "EScores")
+#'
+#' @export
+
+tnsGet <- function (object, what)
 {
     if (what == "survivalData")
         return(object@survivalData)
@@ -463,9 +491,6 @@ tns.get <- function (object, para = NULL, what)
     
     else if (what == "keycovar")
         return (object@keycovar)
-    
-    
-    
     
 }
 

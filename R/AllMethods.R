@@ -133,7 +133,7 @@ setMethod("tnsGSEA2",
                   stop("NOTE: TNS object requires preprocessing!")
               
               #-- run gsea2 and update TNS
-              tni <- tns.get(tns, what = "TNI")
+              tni <- tnsGet(tns, what = "TNI")
               EScores <- tni.gsea2(tni, ... = ...)
               tns <- tns.set(tns, EScores, "EScores")
               tns <- tns.set(tns, what = "status-2")
@@ -239,8 +239,8 @@ setMethod("tnsKM",
               tns <- .tns.stratification(tns, nSections = nSections)
               
               #-- 
-              survData <- tns.get(tns, what = "survivalData")
-              EScores <- tns.get(tns, what = "EScores")
+              survData <- tnsGet(tns, what = "survivalData")
+              EScores <- tnsGet(tns, what = "EScores")
               #-- 
               survData$event[survData$time>endpoint]<-0
               survData$time[survData$time>endpoint]<-endpoint
@@ -385,9 +385,9 @@ setMethod("tnsCox",
               .tns.checks(tns@survivalData, type = "survival_cox")
               
               #-- gets
-              EScores <- tns.get(tns, what = "EScores")
-              survData <- tns.get(tns, what = "survivalData")
-              keycovar <- tns.get(tns, what = "keycovar")
+              EScores <- tnsGet(tns, what = "EScores")
+              survData <- tnsGet(tns, what = "survivalData")
+              keycovar <- tnsGet(tns, what = "keycovar")
               
               #-- checks
               dif <- EScores$dif
