@@ -1,9 +1,9 @@
 Package: RTNsurvival
 Type: Package
 Title: Survival analysis using transcriptional networks inferred by the RTN package
-Version: 0.2.1
-Author: Clarice S. Groeneveld, Vinicius S. Chagas, Kerstin B. Meyer, Mauro A. A. Castro
-Maintainer: Clarice Groeneveld <clari.groeneveld@gmail.com>
+Version: 0.9.9
+Author: Clarice S. Groeneveld, Vinicius S. Chagas, Mauro A. A. Castro
+Maintainer: Clarice Groeneveld <clari.groeneveld@gmail.com>, Mauro A. A. Castro <mauro.a.castro@gmail.com>
 Depends: R (>= 3.3), methods, RTN
 Imports: survival, RColorBrewer, grDevices, graphics, stats
 Suggests: Fletcher2013b, pheatmap, knitr, rmarkdown, BiocStyle, RUnit, BiocGenerics
