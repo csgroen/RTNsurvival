@@ -162,9 +162,13 @@ tnsPlotGSEA2 <- function (object, aSample, regs = NULL, refsamp = NULL,
 .survplot<-function(EScores,dt,reg,fname,fpath,ylab,xlab,pal,widths,
                     plotpdf,excludeMid,flipcols,attribs,groups,endpoint)
 {
+  
+  #-- organizing data
     tumours<-rev(sort(EScores$dif[,reg],decreasing=TRUE))
     regstatus<-EScores$regstatus[names(tumours),reg]
     nclass<-length(unique(regstatus))
+    
+  #-- organizing plot colors
     if(pal%in%c("red","blue","redblue")){
         if(pal=="red"){
             cols<-pal1(nclass)
@@ -177,22 +181,27 @@ tnsPlotGSEA2 <- function (object, aSample, regs = NULL, refsamp = NULL,
     } else (
         cols<-pal
     )
-    #---
+    #--- adjusting for right number of colors
     if(nclass %% 2 == 0){
         rmc<-(nclass/2)+1
         cols<-cols[-rmc]
     }
-    #---
+    #--- adjusting graphical parameters
     op<-par(no.readonly=TRUE)
     np<-length(tumours)
     nms<-pretty(c(1,np),eps.correct=1)+1
     dp<-nms[2]-nms[1]
     pp<-length(nms)
-    if((abs(nms[pp]-np)/dp)>0.6)nms<-nms[-pp]
+    
+    if((abs(nms[pp]-np)/dp)>0.6)
+      nms<-nms[-pp]
+    
     nms[length(nms)]<-np
     layout( matrix(c(1,2,3),1,3),widths=widths )
     par(mgp=c(2.5,0.4,0),mar=c(6.5,5,3,0.7))
     xlim<-range(tumours)+c(-0.5,0.5)
+    
+    #--- first panel plot (Sample statification)
     barplot(tumours,space=0,xlim=c(-2,2),axes=FALSE,cex.lab=1.2,
             col=cols[as.factor(regstatus)],
             horiz=TRUE,border=NA,axisnames=FALSE,ylab="Tumours",xlab="", 
@@ -201,7 +210,8 @@ tnsPlotGSEA2 <- function (object, aSample, regs = NULL, refsamp = NULL,
     mtext(reg,3,adj=0.1, line=-0.5,cex=0.8)
     axis(2,at=nms,labels=nms,tcl=-0.2, las=2, lwd=1.8, cex.axis=1.2)
     axis(1,tcl=-0.2, lwd=1.8, cex.axis=1.2)
-    #---
+    
+    #--- second panel plot (Covariable status, optional)
     if(!is.null(attribs)){
         attribs<-attribs[names(regstatus),]
         par(mar=c(7.1,0,3.8,0))
@@ -223,7 +233,7 @@ tnsPlotGSEA2 <- function (object, aSample, regs = NULL, refsamp = NULL,
     } else {
         plot.new()
     }
-    #---run KM one each time
+    #--- third panel plot (Kaplan-Meier)
     if(excludeMid && nclass %% 2 != 0 && nclass>1){
         rmc<-(nclass+1)/2
         cols<-cols[-rmc]
@@ -236,6 +246,7 @@ tnsPlotGSEA2 <- function (object, aSample, regs = NULL, refsamp = NULL,
     if(length(sections)<length(cols))cols<-cols[-( (length(cols)+1)/2 )]
     ddt<-dt[names(regstatus),]
     ddt$class<-regstatus
+    #-- survival analysis
     res1 <- survfit(Surv(time,event) ~ class, data = ddt)
     par(mar=c(6.5,5,3,1))
     plot(res1, col=cols,lwd=1.8,axes=FALSE,cex.lab=1.2,cex=0.5,mark.time=TRUE, 
@@ -358,12 +369,13 @@ pal3<-function(nclass){
     xlabs<-.prettylog(xlim)
     xlim<-range(xlim)
     
-    #---
+    #--- plot graph
     nIN = 2
     nOUT = nrow(resall) +1
     op<-par(no.readonly=TRUE)
     ylim <- c(0, nOUT+1)
-    if (plotpdf) pdf(file = filen, width = width, height = height)
+    if (plotpdf) 
+        pdf(file = filen, width = width, height = height)
     par(mai=c(0.4,1.2*len,1,0.7), mgp=c(3,0.5,0), yaxs="i", xaxs="i")
     plot(NA,log="x",xlim=xlim,ylim=ylim,axes=FALSE,ylab="",xlab="")
     segments(xlim[1], nIN:nOUT, resall[,3], col= "grey85",lwd=1.5, lty="21", 
@@ -384,7 +396,10 @@ pal3<-function(nclass){
            col=pal, pch=18, lwd=1.2, xjust=0.5, yjust=0.5, bty="n", cex=0.65, 
            pt.cex = 0.9)
     
-    if(plotpdf) dev.off()
+    if(plotpdf) {
+        message("NOTE: 'PDF' file was generated")
+        dev.off()
+    }
     par(op)
     invisible(resall)
     

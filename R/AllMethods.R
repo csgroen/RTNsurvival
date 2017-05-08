@@ -238,7 +238,7 @@ setMethod("tnsKM",
               #-- stratification
               tns <- .tns.stratification(tns, nSections = nSections)
               
-              #-- 
+              #-- organize data
               survData <- tnsGet(tns, what = "survivalData")
               EScores <- tnsGet(tns, what = "EScores")
               #-- 
@@ -296,14 +296,19 @@ setMethod("tnsKM",
               } else {
                   for(reg in reglist){
                       if(plotpdf)
+                      {
                           pdf(file=paste(fpath,"/",reg,fname,".pdf",sep=""), 
                               width=width, height=height)
+                      }
                       .survplot(EScores,survData,reg,fname,fpath,ylab,xlab,
                                 pal,panelWidths,
                                 plotpdf,excludeMid,flipcols,attribs,groups,
                                 endpoint)
                       if(plotpdf)
+                      {
+                        message("NOTE: 'PDF' file was generated")
                           dev.off()
+                      }
                   }
               }
               
