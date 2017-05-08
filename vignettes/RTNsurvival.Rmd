@@ -1,6 +1,6 @@
 ---
 title: "RTNsurvival: An R/Bioconductor package for survival analysis using transcriptional networks and regulons."
-author: "Clarice S. Groeneveld, Vinícius S. Chagas, Kerstin B. Meyer, Mauro A. A. Castro."
+author: "Clarice S. Groeneveld, Vinícius S. Chagas, Gordon Robertson, Kerstin B. Meyer, Mauro A. A. Castro."
 date: "`r Sys.Date()`"
 bibliography: bibliography.bib
 output: BiocStyle::html_document
