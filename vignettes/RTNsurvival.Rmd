@@ -7,7 +7,7 @@ output: BiocStyle::html_document
 abstract: This package provides classes and methods to perform survival analysis using transcriptional networks inferred by the [RTN](http://bioconductor.org/packages/RTN/) package, including Kaplan-Meier and multivariate survival analysis using Cox's regression model.
 vignette: >
   %\VignetteIndexEntry{"RTNsurvival: An R/Bioconductor package for survival analysis using transcriptional networks and regulons."}
-  %\VignetteEngine{knitr::knitr}
+  %\VignetteEngine{knitr::knit2html}
   %\VignetteEncoding{UTF-8}
 ---
 
