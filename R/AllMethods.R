@@ -465,6 +465,7 @@ setMethod("tnsCox",
               fm2<-formula( paste(fm1,rownames(resall)[idx], sep="+") )
               resref<-summary(coxph(fm2, data=summary))$conf.int
               resall<-rbind(resref[-nrow(resref),],resall)
+              rownames(resall)[1:length(keycovar)] <- tnsGet(tns, "keycovar")
               resall<-resall[nrow(resall):1,]
               
               #--- add symbols to rownames
