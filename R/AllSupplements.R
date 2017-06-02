@@ -204,7 +204,7 @@ tnsPlotGSEA2 <- function (object, aSample, regs = NULL, refsamp = NULL,
     #--- first panel plot (Sample statification)
     barplot(tumours,space=0,xlim=c(-2,2),axes=FALSE,cex.lab=1.2,
             col=cols[as.factor(regstatus)],
-            horiz=TRUE,border=NA,axisnames=FALSE,ylab="Tumours",xlab="", 
+            horiz=TRUE,border=NA,axisnames=FALSE,ylab="Samples",xlab="", 
             beside=TRUE, lwd=1)
     mtext("Enrichment score\n( dES )",1,adj=0.5, line=3,cex=0.8)
     mtext(reg,3,adj=0.1, line=-0.5,cex=0.8)
