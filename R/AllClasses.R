@@ -15,11 +15,12 @@ setClassUnion("TNInull", members = c("TNI", "NULL"))
 #' @slot status a vector containing the processing status of the TNS object.
 #' @slot para a list with the parameters used to compute the GSEA2 analysis.
 #'
-#' @method tnsPreprocess see: 
+#' @method tnsPreprocess 
 #' \code{\link[RTNsurvival:tnsPreprocess]{tnsPreprocess}}
-#' @method tnsGSEA2 see: \code{\link[RTNsurvival:tnsGSEA2]{tnsGSEA2}}
-#' @method tnsKM see: \code{\link[RTNsurvival:tnsKM]{tnsKM}}
-#' @method tnsCox see: \code{\link[RTNsurvival:tnsCox]{tnsCox}}
+#' @method tnsGSEA2 \code{\link[RTNsurvival:tnsGSEA2]{tnsGSEA2}}
+#' @method tnsKM \code{\link[RTNsurvival:tnsKM]{tnsKM}}
+#' @method tnsCox \code{\link[RTNsurvival:tnsCox]{tnsCox}}
+#' @method tnsGet \code{\link[RTNsurvival:tnsGet]{tnsGet}}
 #' @aliases TNS
 #' 
 #' @section Constructor:
@@ -38,23 +39,8 @@ setClassUnion("TNInull", members = c("TNI", "NULL"))
 #'
 #' @exportClass TNS
 #'
-##Class TNS (Transcriptional Network - Survival)
-setClass(
-    "TNS",
-    representation(
-        tni = "TNInull",
-        survivalData="data.frame",
-        keycovar = "character",
-        para="list",
-        EScores="list",
-        status="character"
-    ),
-    prototype=list(
-        tni = NULL,
-        survivalData=data.frame(),
-        keycovar = character(),
-        para=list(),
-        EScores = list(),
-        status=character()
-    )
-)
+## Class TNS (Transcriptional Network - Survival)
+setClass("TNS", representation(tni = "TNInull", survivalData = "data.frame", keycovar = "character", 
+    para = "list", EScores = "list", status = "character"), prototype = list(tni = NULL, 
+    survivalData = data.frame(), keycovar = character(), para = list(), EScores = list(), 
+    status = character()))

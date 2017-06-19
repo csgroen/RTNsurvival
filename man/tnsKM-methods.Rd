@@ -11,7 +11,9 @@
   ylab = "Survival probability", xlab = "Months", pal = "redblue",
   excludeMid = FALSE, flipcols = FALSE, plotpdf = TRUE,
   plotbatch = FALSE, width = 6.3, height = 3.6, panelWidths = c(3, 2,
-  4))
+  4), dES.ylab = "Samples", show.KMlegend = TRUE,
+  KMlegend.pos = "bottomleft", KMlegend.cex = 1, show.pval = TRUE,
+  pval.cex = 1, pval.pos = "topright")
 }
 \arguments{
 \item{tns}{a \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
@@ -27,7 +29,7 @@ larger the number, the more subdivisions will be created for the Kaplan-Meier
 analysis.}
 
 \item{endpoint}{a numeric value. It represents the cut-off point for the 
-"time", if any.}
+'time', if any.}
 
 \item{fname}{a string. The name of the file in which the plot will be saved}
 
@@ -39,7 +41,7 @@ analysis.}
 be the measure of time shown in the survival data.frame after the last 
 check-up.}
 
-\item{pal}{a string, which can be "red", "blue" or "redblue". Represents the 
+\item{pal}{a string, which can be 'red', 'blue' or 'redblue'. Represents the 
 colors used in the first and third panels. Alternatively, it can 
 contains the hex values.}
 
@@ -62,6 +64,31 @@ If FALSE, each plot for each reg is saved in a different file.}
 
 \item{panelWidths}{a numeric vector of length=3 specifying the relative 
 width of the internal panels.}
+
+\item{dES.ylab}{a string. The label for the y axis of the first panel.}
+
+\item{show.KMlegend}{a logical value. If TRUE, shows the sample stratification 
+information on the third panel.}
+
+\item{KMlegend.pos}{a string. Provides the location of the sample 
+stratification legend on the third panel. One of: 'bottomright', 
+'bottom', 'bottomleft', 'left', 
+'topleft', 'top', 'topright', 'right' and 'center'.}
+
+\item{KMlegend.cex}{a numeric value. Provides the character expansion factor 
+for the stratification legend, which alters the size and spacing of the font 
+in the legend.}
+
+\item{show.pval}{a logical value. If TRUE, shows the Logrank P-value for the 
+Kaplan-Meier plot on the third panel.}
+
+\item{pval.cex}{a numeric value. Provides the character expansion factor for 
+the pvalue legend, which alters the size and spacing of the font in the 
+legend.}
+
+\item{pval.pos}{a string. Provides the location of the Logrank P-value on 
+the third panel. One of: 'bottomright', 'bottom', 'bottomleft', 'left', 
+'topleft', 'top', 'topright', 'right' and 'center'.}
 }
 \value{
 A plot, showing the graphical analysis of provided survival data.
@@ -75,20 +102,16 @@ The third panel shows a Kaplan-Meier plot computed for the given survival
 data, with a curve for each section.
 }
 \examples{
-data(dt4rtn, package="RTN")
+# load survival data
 data(survival.data)
 
-# compute regulons for 3 TFs using the RTN package
-rtni <- new("TNI", gexp=dt4rtn$gexp, 
-transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
-rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
-rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=1000
-rtni<-tni.dpi.filter(rtni, verbose=FALSE)
+# load TNI-object
+data(stni, package = "RTN")
 
-rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
+stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), 
 time = 1, event = 2)
-rtns <- tnsGSEA2(rtns, verbose=FALSE)
-tnsKM(rtns, regs="FOXM1", attribs = list(c("ER+","ER-"),c("G1","G2","G3")), 
+stns <- tnsGSEA2(stns, verbose=FALSE)
+tnsKM(stns, regs='FOXM1', attribs = list(c('ER+','ER-'),c('G1','G2','G3')), 
 plotpdf = FALSE)
 
 }

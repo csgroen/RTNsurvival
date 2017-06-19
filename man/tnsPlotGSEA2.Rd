@@ -6,7 +6,7 @@
 \usage{
 tnsPlotGSEA2(object, aSample, regs = NULL, refsamp = NULL, log = FALSE,
   ntop = NULL, pValueCutoff = 0.05, pAdjustMethod = "BH",
-  verbose = TRUE, ...)
+  verbose = TRUE, plotpdf = TRUE, ...)
 }
 \arguments{
 \item{object}{a TNS object}
@@ -33,6 +33,8 @@ See \code{\link[stats:p.adjust]{p.adjust}}}
 \item{verbose}{a logical value. If TRUE, prints status of function while 
 executing.}
 
+\item{plotpdf}{a single logical value.}
+
 \item{...}{parameters which will be passed to 
 \code{\link[RTN:tna.plot.gsea2]{tna.plot.gsea2}},
 such as ylimPanels, heightPanels, width, height, ylabPanels, xlab...}
@@ -45,20 +47,16 @@ Makes a 2-tailed GSEA plot for a certain phenotype (sample)
 present in a TNS. A wrapper of \code{\link[RTN:tna.plot.gsea2]{tna.plot.gsea2}}
 }
 \examples{
-data(dt4rtn, package="RTN")
+# load survival data
 data(survival.data)
 
-# compute regulons for 3 TFs using the RTN package
-rtni <- new("TNI", gexp=dt4rtn$gexp, 
-transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
-rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
-rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=100
-rtni<-tni.dpi.filter(rtni, verbose=FALSE)
+# load TNI-object
+data(stni, package = "RTN")
 
-rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
+stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), 
 time = 1, event = 2)
-rtns <- tnsGSEA2(rtns, verbose=FALSE)
-tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1")
+stns <- tnsGSEA2(stns, verbose=FALSE)
+tnsPlotGSEA2(stns, 'MB-5115', regs = 'FOXM1')
 
 }
 \seealso{

@@ -54,20 +54,16 @@ A Cox hazard model plot. If TRUE, generates a pdf plot.
 Run Cox multivariate regression for regulons and key covariables.
 }
 \examples{
-data(dt4rtn, package="RTN")
+# load survival data
 data(survival.data)
 
-# compute regulons for 3 TFs using the RTN package
-rtni <- new("TNI", gexp=dt4rtn$gexp, 
-transcriptionFactors=dt4rtn$tfs[c("FOXM1","E2F2","PTTG1")])
-rtni <- tni.preprocess(rtni,gexpIDs=dt4rtn$gexpIDs, verbose=FALSE)
-rtni<-tni.permutation(rtni, nPermutations=100, verbose=FALSE) #sets 'nPermutations'>=1000
-rtni<-tni.dpi.filter(rtni, verbose=FALSE)
+# load TNI-object
+data(stni, package = "RTN")
 
-rtns <- tnsPreprocess(rtni, survival.data, keycovar = c("Grade","Age"), 
+stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), 
 time = 1, event = 2)
-rtns <- tnsGSEA2(rtns, verbose=FALSE)
-tnsCox(rtns, regs = c("PTTG1","E2F2","FOXM1"), sortregs = TRUE, 
+stns <- tnsGSEA2(stns, verbose=FALSE)
+tnsCox(stns, regs = c('PTTG1','E2F2','FOXM1'), sortregs = TRUE, 
 plotpdf = FALSE)
 
 }
