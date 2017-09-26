@@ -54,17 +54,6 @@
         return(object1)
     } else if (type == "Keycovars")
     {
-<<<<<<< HEAD
-        if (!is.character(object1)) 
-            stop("'keycovar' must be a character vector.", call. = FALSE)
-        if (!all(object1 %in% colnames(object2))) 
-            stop("All strings in 'keycovar' must be colnames in 'survivalData'", 
-                call. = FALSE)
-        for (col in object1)
-        {
-            if (!is.numeric(object2[, col])) 
-                stop("All values in 'keycovar' columns must be numeric.", call. = FALSE)
-=======
         if(!is.null(object1)) {
             if (!is.character(object1)) 
                 stop("'keycovar' must be a character vector.", call. = FALSE)
@@ -76,7 +65,6 @@
                 if (!is.numeric(object2[, col])) 
                     stop("All values in 'keycovar' columns must be numeric.", call. = FALSE)
             }
->>>>>>> origin/master
         }
     } else if (type == "Samples")
     {
@@ -107,9 +95,6 @@
         if (!dir.exists(object1)) 
             stop("fpath does not lead to an existing directory.", call. = FALSE)
         
-<<<<<<< HEAD
-    } else if (type == "Fname")
-=======
     } else if (type == "Path2") {
         if (!is.singleString(object1) & !is.null(object1)) {
             stop("`path` must be a single string or NULL.", call. = FALSE)
@@ -117,7 +102,6 @@
     }
     
     else if (type == "Fname")
->>>>>>> origin/master
     {
         if (!is.singleString(object1)) 
             stop("'fname' must be a single character.", call. = FALSE)
@@ -292,26 +276,16 @@ colnames, at the 'tns' object!",
     } else if (type == "panelWidths")
     {
         if (!is.numeric(object1) || length(object1) != 3) 
-<<<<<<< HEAD
-            stop("'panelWidths' must be a numeric vector of length 2.")
-        if (object1[1] == 0 || object1[3] == 0) 
-            stop("The width of the first and third panels cannot be 0.")
-=======
             stop("'panelWidths' must be a numeric vector of length 3.", 
                  call. = FALSE)
         if (object1[1] == 0 || object1[3] == 0) 
             stop("The width of the first and third panels cannot be 0.", 
                  call. = FALSE)
->>>>>>> origin/master
     } else if (type == "status")
     {
         if (object1@status["Preprocess"] != "[x]") 
             stop("NOTE: TNS object requires preprocessing!")
         if (object1@status["GSEA2"] != "[x]") 
-<<<<<<< HEAD
-            stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2'!")
-    }
-=======
             stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2'!", 
                  call. = FALSE)
     } else if (type == "MBR") {
@@ -360,7 +334,6 @@ colnames, at the 'tns' object!",
         }
     }
     
->>>>>>> origin/master
 }
 
 

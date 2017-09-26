@@ -26,10 +26,7 @@ Transcriptional networks are important tools to visualize complex biological sys
 ```{r}
 library(RTN)
 data(stni, package="RTN")
-<<<<<<< HEAD
-=======
 stni <- upgradeTNI(stni)
->>>>>>> origin/master
 ```
 
 This data object is a `TNI-class` created from a subset of the expression matrix in the `Fletcher2013b` package. The TNI object contains a minimal toy reconstruction of 5 regulons (PGR, MYB, E2F2, FOXM1 and PTTG1).
@@ -116,8 +113,6 @@ pheatmap::pheatmap(t(enrichmentScores$dif),
 
 <legend><b>Figure 4</b> - Differential Enrichment Scores for GEXP samples. This heatmap shows two main regulon clusters. The PGR and MYB regulons are repressed in the ER- samples and activated in ER+ samples. The PTTG1, E2F2 and FOXM1 regulons, on the other hand, are activated in ER- samples and repressed in ER+ samples. </legend>
 
-<<<<<<< HEAD
-=======
 ## Evaluating survival in dual regulons
 Integrating data from different regulons may be of interest, especially if they come from different regulatory
 networks made for the same expression matrix. Concepts from the **RTNduals** package can be used to compute
@@ -164,7 +159,6 @@ The `dualsSurvivalPanel` method generated a directory containing six plots:
 </legend>
 
 
->>>>>>> origin/master
 ## Session Info
 ```{r}
 sessionInfo()

@@ -34,11 +34,7 @@
 #' @aliases tnsPreprocess
 #' @export
 #' 
-<<<<<<< HEAD
-setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar, time = 1, 
-=======
 setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, time = 1, 
->>>>>>> origin/master
     event = 2, samples = NULL) {
     #-- tni checks
     if (tni@status["Preprocess"] != "[x]") 
@@ -52,12 +48,6 @@ setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, t
                        package!")
     
     #-- missing
-<<<<<<< HEAD
-    if (missing(survivalData)) 
-        stop("Must provide a 'survivalData' object.")
-    if (missing(keycovar)) 
-        stop("Must provide a 'keycovar' object.")
-=======
     if (missing(survivalData)) {
         res <- try(tni.get(tni, "colAnnotation"), silent = TRUE)
         if (class(res) == "try-error")
@@ -65,7 +55,6 @@ setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, t
         else
             survivalData <- res
     }
->>>>>>> origin/master
     
     #-- par checks
     .tns.checks(survivalData, type = "survivalData")
@@ -447,11 +436,7 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
     
     #--- get cox formula
     if (is.null(tns@keycovar)) {
-<<<<<<< HEAD
-        fm1 <- "Surv(time, event)"
-=======
         fm1 <- "Surv(time, event) ~ "
->>>>>>> origin/master
     } else {
         fm1 <- paste("Surv(time, event) ~ ", paste(keycovar, collapse = "+"), sep = "")
     }
@@ -543,12 +528,6 @@ setMethod("tnsGet", "TNS", function(object, what)
     else if (what == "keycovar") {
         return(object@keycovar)
     }
-<<<<<<< HEAD
-    else {
-        stop("'what' must be one of: 'survivalData', 'EScores', 'TNI' and
-             'keycovar'")
-    }
-=======
     else if (what == "regulatoryElements") {
         return(object@tni@regulatoryElements)
     }
@@ -864,6 +843,5 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, att
                   "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
     print(msg)
     
->>>>>>> origin/master
 })
 

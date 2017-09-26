@@ -1,9 +1,5 @@
 
-<<<<<<< HEAD
-setGeneric("tnsPreprocess", function(tni, survivalData, keycovar, time = 1, event = 2, 
-=======
 setGeneric("tnsPreprocess", function(tni, survivalData, keycovar = NULL, time = 1, event = 2, 
->>>>>>> origin/master
     samples = NULL) standardGeneric("tnsPreprocess"), package = "RTNsurvival")
 
 setGeneric("tnsGSEA2", function(tns, ...) standardGeneric("tnsGSEA2"), package = "RTNsurvival")
@@ -21,8 +17,6 @@ setGeneric("tnsCox", function(tns, regs = NULL, endpoint = 60, fname = "coxplot"
         10), sortregs = TRUE, plotpdf = TRUE) standardGeneric("tnsCox"), package = "RTNsurvival")
 
 setGeneric("tnsGet", function(object, what) standardGeneric("tnsGet"), 
-<<<<<<< HEAD
-=======
            package = "RTNsurvival")
 
 setGeneric("dualSurvivalPanel", 
@@ -30,5 +24,4 @@ setGeneric("dualSurvivalPanel",
                     nSections = 2, pal = "BrBG", excludeMid = FALSE, 
                     sectionsLegend = NULL, panelWidths = c(2,3), 
                     png.res = 150) standardGeneric("dualSurvivalPanel"), 
->>>>>>> origin/master
            package = "RTNsurvival")
