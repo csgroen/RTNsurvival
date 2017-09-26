@@ -34,7 +34,11 @@
 #' @aliases tnsPreprocess
 #' @export
 #' 
+<<<<<<< HEAD
 setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar, time = 1, 
+=======
+setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, time = 1, 
+>>>>>>> origin/master
     event = 2, samples = NULL) {
     #-- tni checks
     if (tni@status["Preprocess"] != "[x]") 
@@ -48,10 +52,20 @@ setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar, time = 1
                        package!")
     
     #-- missing
+<<<<<<< HEAD
     if (missing(survivalData)) 
         stop("Must provide a 'survivalData' object.")
     if (missing(keycovar)) 
         stop("Must provide a 'keycovar' object.")
+=======
+    if (missing(survivalData)) {
+        res <- try(tni.get(tni, "colAnnotation"), silent = TRUE)
+        if (class(res) == "try-error")
+            stop("Must provide a 'survivalData' object.")
+        else
+            survivalData <- res
+    }
+>>>>>>> origin/master
     
     #-- par checks
     .tns.checks(survivalData, type = "survivalData")
@@ -433,7 +447,11 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
     
     #--- get cox formula
     if (is.null(tns@keycovar)) {
+<<<<<<< HEAD
         fm1 <- "Surv(time, event)"
+=======
+        fm1 <- "Surv(time, event) ~ "
+>>>>>>> origin/master
     } else {
         fm1 <- paste("Surv(time, event) ~ ", paste(keycovar, collapse = "+"), sep = "")
     }
@@ -525,9 +543,327 @@ setMethod("tnsGet", "TNS", function(object, what)
     else if (what == "keycovar") {
         return(object@keycovar)
     }
+<<<<<<< HEAD
     else {
         stop("'what' must be one of: 'survivalData', 'EScores', 'TNI' and
              'keycovar'")
     }
+=======
+    else if (what == "regulatoryElements") {
+        return(object@tni@regulatoryElements)
+    }
+    else {
+        stop("'what' must be one of: 'survivalData', 'EScores', 'TNI',
+             'keycovar' and 'regulatoryElements'.")
+    }
+})
+
+#' Panel plot of regulons in a inferred dual
+#'
+#' Returns a folder with 5 plots that form a panel: 
+#' [1] sample stratification based on activity of regulon 1, 
+#' [2] sample stratification based on activity of regulon 2, 
+#' [3] a scatter plot of samples's rank in both stratifications based on 
+#' regulon activity
+#' [4] Kaplan-Meier curves based on both regulon stratifications and interaction 
+#' of regulons in dual,
+#' [5] Cox regression for both regulons and the interaction between the activity
+#' information for the dual. 
+#' The function also returns a PNG panel with all plots aligned.
+#'
+#' @param mbr an \linkS4class{MBR} object computed from
+#' the same \linkS4class{TNI} objects that were used to make the
+#' \linkS4class{TNS} objects.
+#' @param tns1 a `TNS` object with regulons used to compute the duals.
+#' @param tns2 another `TNS`  object computed with the other regulons used to 
+#' compute the duals. It's optional if all duals are from the same 'TNI' object.
+#' @param dual a character string with the name of a dual
+#' @param attribs a numeric vector. Contains the columns of the survival 
+#' data.frame which will be plotted as sample status in first and second plots.
+#' @param endpoint a numeric value. It represents the cut-off point for the 
+#' 'time', if any.
+#' @param path a string. The path to the directory where the plot will be saved.
+#' @param nSections numeric value for the stratification of the sample. The 
+#' larger the number, the more subdivisions will be created for the 
+#' Kaplan-Meier and sample stratification analysis.
+#' @param pal a palette name to be passed to \code{\link[RColorBrewer:brewer.pal]{brewer.pal}}.
+#' @param excludeMid a logical value. if TRUE, doesn't use the samples that fall in mid section 
+#' of the stratification for computations.
+#' @param sectionsLegend a string vector. It must contain names for the sections
+#' of the stratification on the interaction Kaplan-Meier. If NULL, the sections
+#' are simply numbered in the legend.
+#' @param panelWidths a numeric vector of length 2. It must contain a proportion
+#' for the two panels in plots [1] and [2].
+#' @param png.res a numeric value. It represents the resolution in ppi for the
+#' png panel.
+#' 
+#' @examples
+#' # load survival data
+#' data(survival.data)
+#' 
+#' # load TNI-object
+#' data(stni, package = "RTN")
+#' stni <- upgradeTNI(stni)
+#' 
+#' # perform survival analysis
+#' stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'),
+#'                       time = 1, event = 2)
+#' stns <- tnsGSEA2(stns, verbose=FALSE)
+#' 
+#' # create MBR-object using TF-TF duals
+#' library(RTNduals)
+#' tni <- tnsGet(stns, "TNI")
+#' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
+#' mbr <- mbrAssociation(mbr, prob = 0.75)
+#' mbr <- mbrDuals(mbr)
+#' duals <- mbrGet(mbr, what="dualRegulons")
+#' 
+#' # create panel plot
+#' 
+#' dualSurvivalPanel(mbr, stns, dual = duals[1], 
+#'                   attribs = c("ER+", "ER-", "PR+", "PR-"))
+#'
+#' @seealso \code{\link[RTNsurvival:tnsKM]{tnsKM}},
+#' \code{\link[RTNsurvival:tnsCox]{tnsCox}}
+#' @return A folder containing 5 pdf survival plots and one png survival panel
+#' with all plots
+#' @importFrom RTN tni.get
+#' @importClassesFrom RTNduals MBR
+#' @importFrom png readPNG
+#' @importFrom graphics rasterImage box
+#' @importFrom grDevices png
+#' @importFrom stats lm cor
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @docType methods
+#' @rdname dualSurvivalPanel-methods
+#' @aliases dualSurvivalPanel
+#' @export
+#' 
+setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, attribs = NULL, endpoint = 60,
+                   path = NULL,  nSections = 2, 
+                   pal = "BrBG", excludeMid = FALSE, sectionsLegend = NULL,
+                   panelWidths = c(2,3), png.res = 150)
+{
+    
+    .tns.checks(mbr, type = "MBR")
+    .tns.checks(tns1, type = "status")
+    if (!is.null(tns2))
+        .tns.checks(tns2, type = "status")
+    .tns.checks(dual, mbr, type = "Duals")
+    .tns.checks(attribs, tnsGet(tns1, "survivalData"), type = "attribs")
+    .tns.checks(endpoint, type = "EndPoint")
+    .tns.checks(path, type = "Path2")
+    .tns.checks(pal, type = "CBpal")
+    .tns.checks(nSections, type = "NSections")
+    .tns.checks(panelWidths, type = "PanelWidths2")
+    .tns.checks(png.res, type = "png.res")
+
+    #-- check sections legend
+    if(!is.null(sectionsLegend)) {
+        if(excludeMid) {
+            if (length(sectionsLegend) != nSections*2) {
+                stop("`sectionsLegend` length doesn't match number of sections.",
+                     .call = FALSE)
+            }
+        }
+        else {
+            if (length(sectionsLegend) != nSections*2+1) {
+                stop("`sectionsLegend` length doesn't match number of sections.",
+                     .call = FALSE)
+            }
+            }
+    }
+    regs <- unlist(strsplit(dual, "~"))
+    
+    #--- creating folder (if not existent)
+    if (is.null(path)) {
+        if(!dir.exists(dual))
+            dir.create(dual)
+        path <- dual
+    }
+    else if(!dir.exists(path)) {
+        dir.create(path)
+    }
+    
+    #-- data wrangling
+    tns1.reg.el <- tnsGet(tns1, "regulatoryElements")
+    if (is.null(tns2)) {
+        all.regs <- unlist(strsplit(dual, "~"))
+        if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
+        {
+            stop("If tns2 is not given, all regulons used to compute duals must be
+                 present in `regulatoryElements` of tns1.")
+        }
+        tns2 <- tns1
+    }
+    else {
+        tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
+        if (!(regs[1] %in% tns1.reg.el) & !(regs[1] %in% names(tns1.reg.el))){
+            if(!(regs[2] %in% tns1.reg.el) & !(regs[2] %in% names(tns1.reg.el))) {
+                stop("`tns1` doesn't contain any useful information.")
+            }
+            else {
+                tmp <- tns2
+                tns2 <- tns1
+                tns1 <- tmp
+                rm(tmp)
+                if (!(regs[1] %in% tns2.reg.el) & !(regs[1] %in% names(tns2.reg.el))) {
+                    stop("`tns2` doesn't contain any useful information.")
+                }    
+            }
+            
+        }
+        else {
+            if (!(regs[2] %in% tns2.reg.el) & !(regs[2] %in% names(tns2.reg.el))) {
+                stop("`tns2` doesn't contain any useful information.") 
+            }
+        }
+    }
+    #-- check if tns are for same gexp
+    if(!identical(tni.get(tnsGet(tns1, "TNI"), "gexp"), 
+              tni.get(tnsGet(tns2, "TNI"), "gexp"))) {
+        stop("The expression matrix (gexp) used to compute the TNIs must be the same.")
+    }
+    
+    #--- Coxtable
+    dualCoxTable <- dualCoxTable(mbr, tns1, tns2, duals = dual, 
+                                 excludeMid = excludeMid, verbose = FALSE)
+    
+    #----- dES plots
+    fname <- paste(path, "/", "1.dESregPlot_", regs[1], ".pdf", sep = "")
+    pdf(file = fname, width = 3.897, height = 4.1335)
+    dESregPlot(tns1, regs = regs[1], attribs = attribs, 
+               panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections)
+    dev.off()
+    
+    fname <- paste(path, "/", ".1.dESregPlot_", regs[1], ".png", sep = "")
+    png(filename = fname, width = 3.897*png.res, height = 4.1335*png.res, res = png.res)
+    dESregPlot(tns1, regs = regs[1], attribs = attribs, 
+               panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections,
+               xname = "a")
+    dev.off()
+    
+    fname <- paste(path, "/", "2.dESregPlot_", regs[2], ".pdf", sep = "")
+    pdf(file = fname, width = 3.897, height = 4.1335)
+    dESregPlot(tns2, regs = regs[2], attribs = attribs, 
+               panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections)
+    dev.off()
+    
+    fname <- paste(path, "/", ".2.dESregPlot_", regs[2], ".png", sep = "")
+    png(filename = fname, width = 3.897*png.res, height = 4.1335*png.res, res = png.res)
+    dESregPlot(tns2, regs = regs[2], attribs = attribs, 
+               panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections,
+               xname = "b")
+    dev.off()
+    
+    #----- KM plots (separate regs)
+    fname <- paste(path, "/", "4.KMplot_", dual, ".pdf", sep = "")
+    pdf(file = fname, width = 3.897, height = 6.3)
+    layout(matrix(c(1,2,3,3), ncol = 2, byrow = TRUE), widths = c(4,3.3), heights = c(3,5))
+    par(mar = c(1,1,1,1))
+    dES1 <- KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+                      pval.pos = "bottomright", ylab.cex = 1.2, xlab.cex = 1.2, nSections = nSections,
+                      excludeMid = excludeMid)
+    dES2 <- KMregPlot(tns2, reg = regs[2], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+                      pval.pos = "bottomright", y.axis = TRUE, ylab.cex = 1.2, xlab.cex = 1.2, ylab = "", 
+                      nSections = nSections, excludeMid = excludeMid)
+    dES2$regstatus <- dES2$regstatus[rownames(dES1$regstatus),]
+    samples <- rownames(dES1$regstatus)[dES1$regstatus[,regs[1]] == dES2$regstatus[,regs[2]]]
+    pal.cols <- brewer.pal((nSections*4), pal)[c(2:(nSections+1), 
+                                                 (nSections+3):(nSections*4))]
+    if (!excludeMid)
+        pal.cols <- c(pal.cols[1:nSections], "grey80", pal.cols[nSections+2:length(pal.cols)])
+    #-- if samples are disagreeing: use opposites for KM
+    samples_cor <- cor(dES1$regstatus[,regs[1]], dES2$regstatus[,regs[2]])
+    
+    if (samples_cor < 0) {
+        samples <- NULL
+        nStrat <- nSections*2+1
+        up <- 1:nStrat
+        down <- nStrat:1
+        up <- up[-(nSections+1)]
+        down <- down[-(nSections+1)]
+        
+        for (i in 1:length(up)) {
+            current_samps <- rownames(dES1$regstatus)[dES1$regstatus[,regs[1]] == up[i]]
+            current_samps[current_samps %in% rownames(dES2$regstatus)[dES2$regstatus[,regs[2]] == down[i]]]
+            samples <- c(samples, current_samps)
+        }
+        
+        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+                  pval.pos = "bottomright", title = "Interaction", samples = samples, KMlegend.cex = 0.7, 
+                  ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections,
+                  excludeMid = excludeMid, pal = pal.cols)
+        mode <- "disagreement"
+        
+    }
+    else {
+        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+                  title = "Interaction", ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections, pal = pal.cols,
+                  excludeMid = excludeMid)
+        mode <- "agreement"
+    }
+    dev.off()
+    
+    fname <- paste(path, "/", ".4.KMplot_", dual, ".png", sep = "")
+    png(filename = fname, width = 3.897*png.res, height = 6.3*png.res, res = png.res)
+    layout(matrix(c(1,2,3,3), ncol = 2, byrow = TRUE), widths = c(4,3.3), heights = c(3,5))
+    par(mar = c(1,1,1,1))
+    KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+              pval.pos = "bottomright", ylab.cex = 1.2, xlab.cex = 1.2, nSections = nSections,
+              excludeMid = excludeMid, xname = "c")
+    KMregPlot(tns2, reg = regs[2], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+              pval.pos = "bottomright", y.axis = TRUE, ylab.cex = 1.2, xlab.cex = 1.2, ylab = "", 
+              nSections = nSections, excludeMid = excludeMid)
+    
+    if (mode == "disagreement") {
+        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+                  pval.pos = "bottomright", title = "Interaction", samples = samples, KMlegend.cex = 0.7, 
+                  ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections,
+                  excludeMid = excludeMid, pal = pal.cols)
+    }
+    else {
+        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+                  pval.pos = "bottomright", title = "Interaction", samples = samples, KMlegend.cex = 0.8, 
+                  ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections, pal = pal.cols,
+                  excludeMid = excludeMid)
+    }
+    
+    dev.off()
+    
+    #----- Scatter plot
+    
+    fname <- paste(path, "/",  "3.rankScatter_", dual, ".pdf", sep = "")
+    pdf(fname, width = 3.3, height = 3.5)
+    rankScatter(tns1, tns2, dual, dES1, dES2, nSections = nSections, mode = mode,
+                pal = pal)
+    dev.off()
+    
+    fname <- paste(path, "/",  ".3.rankScatter_", dual, ".png", sep = "")
+    png(fname, width = 3.3*png.res, height = 3.5*png.res, res = png.res)
+    rankScatter(tns1, tns2, dual, dES1, dES2, nSections = nSections, mode = mode,
+                pal = pal)
+    dev.off()
+    
+    
+    #----- Cox plot
+    
+    fname <- paste(path, "/",  "5.coxplot_", dual, ".pdf", sep = "")
+    pdf(file = fname, width = 4.25, height = 2.5)
+    dualCoxPlot(dual, dualCoxTable)
+    dev.off()
+    
+    fname <- paste(path, "/",  ".5.coxplot_", dual, ".png", sep = "")
+    png(filename = fname, width = 4.25*png.res, height = 2.5*png.res, res = png.res)
+    dualCoxPlot(dual, dualCoxTable, xname = "d")
+    dev.off()
+    
+    pngPanel(dual, path, png.res)
+    
+    msg <- paste0("Plots successfull. ", "Files can be found in ", path, " directory. ", 
+                  "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
+    print(msg)
+    
+>>>>>>> origin/master
 })
 

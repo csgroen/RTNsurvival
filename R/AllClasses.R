@@ -1,4 +1,8 @@
 setClassUnion("TNInull", members = c("TNI", "NULL"))
+<<<<<<< HEAD
+=======
+setClassUnion("charnull", members = c("character", "NULL"))
+>>>>>>> origin/master
 
 #' TNS: An S4 class for survival survival analysis using transcriptional 
 #' networks inferred by the RTN package.
@@ -40,7 +44,13 @@ setClassUnion("TNInull", members = c("TNI", "NULL"))
 #' @exportClass TNS
 #'
 ## Class TNS (Transcriptional Network - Survival)
+<<<<<<< HEAD
 setClass("TNS", representation(tni = "TNInull", survivalData = "data.frame", keycovar = "character", 
     para = "list", EScores = "list", status = "character"), prototype = list(tni = NULL, 
     survivalData = data.frame(), keycovar = character(), para = list(), EScores = list(), 
+=======
+setClass("TNS", representation(tni = "TNInull", survivalData = "data.frame", keycovar = "charnull", 
+    para = "list", EScores = "list", status = "character"), prototype = list(tni = NULL, 
+survivalData = data.frame(), keycovar = NULL, para = list(), EScores = list(), 
+>>>>>>> origin/master
     status = character()))

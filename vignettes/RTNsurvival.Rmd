@@ -26,6 +26,10 @@ Transcriptional networks are important tools to visualize complex biological sys
 ```{r}
 library(RTN)
 data(stni, package="RTN")
+<<<<<<< HEAD
+=======
+stni <- upgradeTNI(stni)
+>>>>>>> origin/master
 ```
 
 This data object is a `TNI-class` created from a subset of the expression matrix in the `Fletcher2013b` package. The TNI object contains a minimal toy reconstruction of 5 regulons (PGR, MYB, E2F2, FOXM1 and PTTG1).
@@ -112,6 +116,55 @@ pheatmap::pheatmap(t(enrichmentScores$dif),
 
 <legend><b>Figure 4</b> - Differential Enrichment Scores for GEXP samples. This heatmap shows two main regulon clusters. The PGR and MYB regulons are repressed in the ER- samples and activated in ER+ samples. The PTTG1, E2F2 and FOXM1 regulons, on the other hand, are activated in ER- samples and repressed in ER+ samples. </legend>
 
+<<<<<<< HEAD
+=======
+## Evaluating survival in dual regulons
+Integrating data from different regulons may be of interest, especially if they come from different regulatory
+networks made for the same expression matrix. Concepts from the **RTNduals** package can be used to compute
+dual regulons, which are regulon pairs whose common targets are likely to be affected by both regulators.
+
+The workflow of RTNduals can be used to infer dual TF-TF regulons, using the `TNI` from the example, for 
+demonstration purposes only.
+
+```{r}
+library(RTNduals)
+smbr <- tni2mbrPreprocess(stni, stni, verbose = FALSE)
+smbr <- mbrAssociation(smbr, prob = 0.75, verbose = FALSE)
+smbr <- mbrDuals(smbr, verbose = FALSE)
+mbrGet(smbr, "dualsInformation")
+```
+
+The `smbr` is an object of `MBR-class`, containing the motifs between the regulons represented in
+the `stni` network. As `prob` was set to 75%, only the 25% most significant inferred duals are shown
+in the results.
+
+Now, since the `stns` object and `smbr` object were computed from the same expression matrix,
+we can use the survival information for that cohort in conjunction with the duals information.
+
+```{r, eval = FALSE}
+duals <- mbrGet(smbr, what="dualRegulons")
+dualSurvivalPanel(smbr, rtns, dual = duals[1], 
+                  attribs = c("ER+", "ER-", "PR+", "PR-"))
+```
+
+The `dualsSurvivalPanel` method generated a directory containing six plots:
+<ol>
+
+<li> a sample stratification for regulon 1 of the dual, with sample attributes;</li>
+<li> a sample stratification for regulon 2 of the dual, with the same attributes;</li>
+<li> an interaction scatter plot of the samples, where x and y represent that sample's position in the stratifications;</li>
+<li> Kaplan-Meier curves for both regulons, using their stratifications, and for the interaction between them, with the selected samples;</li>
+<li> a Cox regression plot, showing the association of both regulon activities with risk, as well as the association of the interaction; and</li>
+<li> a panel plot which contains all of these plots in a suggested panel, which is shown in Figure 5.
+</ol>
+
+![title](figures/FOXM1_E2F2.png)
+
+<legend><b>Figure 5</b> - Dual Survival Plot for FOXM1~E2F2 dual regulon. It shows the activity in the samples is positively correlated, but there is no additional hazard ratio information given by the Cox regression of the interaction. **a)** Sample ranking using differential Enrichment Score (dES) of regulon FOXM1. **b)** dES sample ranking for regulon E2F2 and a sample scatter plot, showing the ranking of each sample in both regulons. In this case, FOXM1 and E2F2 agree in sample stratification. **c)** Kaplan-Meier curves. The Interaction curve follows the individual regulons very closely. **d)** Cox regression plot. It doesn't show any association between the activity of these regulons or interaction and hazard ratio.
+</legend>
+
+
+>>>>>>> origin/master
 ## Session Info
 ```{r}
 sessionInfo()
