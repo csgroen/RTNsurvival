@@ -6,7 +6,7 @@
 \alias{tnsPreprocess}
 \title{Preprocessing of TNS class objects.}
 \usage{
-\S4method{tnsPreprocess}{TNI}(tni, survivalData, keycovar, time = 1,
+\S4method{tnsPreprocess}{TNI}(tni, survivalData, keycovar = NULL, time = 1,
   event = 2, samples = NULL)
 }
 \arguments{

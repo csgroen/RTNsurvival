@@ -54,15 +54,17 @@
         return(object1)
     } else if (type == "Keycovars")
     {
-        if (!is.character(object1)) 
-            stop("'keycovar' must be a character vector.", call. = FALSE)
-        if (!all(object1 %in% colnames(object2))) 
-            stop("All strings in 'keycovar' must be colnames in 'survivalData'", 
-                call. = FALSE)
-        for (col in object1)
-        {
-            if (!is.numeric(object2[, col])) 
-                stop("All values in 'keycovar' columns must be numeric.", call. = FALSE)
+        if(!is.null(object1)) {
+            if (!is.character(object1)) 
+                stop("'keycovar' must be a character vector.", call. = FALSE)
+            if (!all(object1 %in% colnames(object2))) 
+                stop("All strings in 'keycovar' must be colnames in 'survivalData'", 
+                     call. = FALSE)
+            for (col in object1)
+            {
+                if (!is.numeric(object2[, col])) 
+                    stop("All values in 'keycovar' columns must be numeric.", call. = FALSE)
+            }
         }
     } else if (type == "Samples")
     {
@@ -93,7 +95,13 @@
         if (!dir.exists(object1)) 
             stop("fpath does not lead to an existing directory.", call. = FALSE)
         
-    } else if (type == "Fname")
+    } else if (type == "Path2") {
+        if (!is.singleString(object1) & !is.null(object1)) {
+            stop("`path` must be a single string or NULL.", call. = FALSE)
+        }
+    }
+    
+    else if (type == "Fname")
     {
         if (!is.singleString(object1)) 
             stop("'fname' must be a single character.", call. = FALSE)
@@ -268,16 +276,64 @@ colnames, at the 'tns' object!",
     } else if (type == "panelWidths")
     {
         if (!is.numeric(object1) || length(object1) != 3) 
-            stop("'panelWidths' must be a numeric vector of length 2.")
+            stop("'panelWidths' must be a numeric vector of length 3.", 
+                 call. = FALSE)
         if (object1[1] == 0 || object1[3] == 0) 
-            stop("The width of the first and third panels cannot be 0.")
+            stop("The width of the first and third panels cannot be 0.", 
+                 call. = FALSE)
     } else if (type == "status")
     {
         if (object1@status["Preprocess"] != "[x]") 
             stop("NOTE: TNS object requires preprocessing!")
         if (object1@status["GSEA2"] != "[x]") 
-            stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2'!")
+            stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2'!", 
+                 call. = FALSE)
+    } else if (type == "MBR") {
+        if(class(object1) != "MBR")
+            stop("`mbr` must be an object of class `MBR`")
+        
+        status <- mbrGet(object1, "status")
+        if(status["Association"] != "[x]") {
+            stop("`mbr` must be evaluated by mbrAssociation", call. = FALSE)
+        }
+    } else if (type == "Duals") {
+        if(class(object1) != "character" & !is.null(object1)) {
+            stop("`duals` must be a character vector or NULL.", call. = FALSE)
+        }
+        if(!is.null(object1)) {
+            duals <- mbrGet(object2, "dualRegulons")
+            if (!all(object1 %in% duals)) {
+                stop("All elements of `duals` must be present in the `mbr` object",
+                     call. = FALSE)
+            }
+        }
+    } else if (type == "CBpal") {
+        valid.pals <- c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", 
+                        "Spectral", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2", 
+                        "Set1", "Set2", "Set3", "Blues", "BuGn", "BuPu", "GnBu", "Greens", 
+                        "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", 
+                        "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd")
+        if (!(object1 %in% valid.pals)) {
+            stop("`pal` must be a valid palette of RColorBrewer.", call. = FALSE)
+        }
+    } else if (type == "NSections") {
+        if (!(object1 %in% 1:3)) {
+            stop("`nSections` must be a number between 1 and 3.", call. = FALSE)
+        }
+        
+    } else if (type == "PanelWidths2") {
+        if (!is.numeric(object1) || length(object1) != 2) 
+            stop("'panelWidths' must be a numeric vector of length 2.", 
+                 call. = FALSE)
+        if (any(object1 == 0)) 
+            stop("The width of the panels cannot be 0.", 
+                 call. = FALSE)
+    } else if (type == "png.res") {
+        if (!is.singleNumber(object1)) {
+            stop("`png.res` must be a single numerical value.")
+        }
     }
+    
 }
 
 
