@@ -1,7 +1,8 @@
 ---
 title: "RTNsurvival: An R/Bioconductor package for survival analysis using transcriptional networks and regulons."
 author: "Clarice S. Groeneveld, Vinícius S. Chagas, Gordon Robertson, Kerstin B. Meyer, Mauro A. A. Castro."
-date: "`r Sys.Date()`"
+date: "`r doc_date()`"
+package: "`r pkg_ver('RTN')`"
 bibliography: bibliography.bib
 output: BiocStyle::html_document
 abstract: This package provides classes and methods to perform survival analysis using transcriptional networks inferred by the [RTN](http://bioconductor.org/packages/RTN/) package, including Kaplan-Meier and multivariate survival analysis using Cox's regression model.
@@ -72,7 +73,7 @@ tnsCox(rtns, sortregs = TRUE, plotpdf = FALSE)
 ```
 
 
-<legend><b>Figure 1</b> - The plot shows the Hazard Ratio for all key covariates and regulons. Lines that are completely to the right of the grey line, shown in red, are positively associated with hazard. This means that samples with high expression of this regulon have poor prognostic. The further to the right or left of the grey line, the more significant is the association.</legend>
+<b>Figure 1</b> - The plot shows the Hazard Ratio for all key covariates and regulons. Lines that are completely to the right of the grey line, shown in red, are positively associated with hazard. This means that samples with high expression of this regulon have poor prognostic. The further to the right or left of the grey line, the more significant is the association.
 
 ## Run the Kaplan-Meier analysis
 
@@ -83,7 +84,7 @@ tnsKM(rtns, regs="FOXM1", attribs = list(c("ER+","ER-"),c("PR+","PR-"),c("G1","G
 endpoint=180, plotpdf = FALSE)
 ```
 
-<legend><b>Figure 2</b> - The Kaplan-Meier plot for FOXM1 shows that samples with high expression of the genes (red and pink) in this regulon have poorer prognostic than those with low expression, as their survival probability is lower than the samples that have low expression of this regulon (in light and dark blue).</legend>
+<b>Figure 2</b> - The Kaplan-Meier plot for FOXM1 shows that samples with high expression of the genes (red and pink) in this regulon have poorer prognostic than those with low expression, as their survival probability is lower than the samples that have low expression of this regulon (in light and dark blue).
 
 ## Plot the 2-tailed GSEA for a given sample
 
@@ -93,7 +94,7 @@ Individual sample differential enrichment analysis can be investigated using the
 tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1", verbose = FALSE, plotpdf = FALSE)
 ```
 
-<legend><b>Figure 3</b> - The 2-tailed GSEA plot for the MB-5116 sample. It shows that the positive targets of the FOXM1 regulator are positively enriched, while the negative targets are negatively enriched. </legend>
+<b>Figure 3</b> - The 2-tailed GSEA plot for the MB-5116 sample. It shows that the positive targets of the FOXM1 regulator are positively enriched, while the negative targets are negatively enriched. 
 
 ## Plot the Differential Enrichment Scores for all regulons and all samples
 
@@ -111,7 +112,7 @@ pheatmap::pheatmap(t(enrichmentScores$dif),
 
 ```
 
-<legend><b>Figure 4</b> - Differential Enrichment Scores for GEXP samples. This heatmap shows two main regulon clusters. The PGR and MYB regulons are repressed in the ER- samples and activated in ER+ samples. The PTTG1, E2F2 and FOXM1 regulons, on the other hand, are activated in ER- samples and repressed in ER+ samples. </legend>
+<b>Figure 4</b> - Differential Enrichment Scores for GEXP samples. This heatmap shows two main regulon clusters. The PGR and MYB regulons are repressed in the ER- samples and activated in ER+ samples. The PTTG1, E2F2 and FOXM1 regulons, on the other hand, are activated in ER- samples and repressed in ER+ samples. 
 
 ## Evaluating survival in dual regulons
 Integrating data from different regulons may be of interest, especially if they come from different regulatory
@@ -155,8 +156,8 @@ The `dualsSurvivalPanel` method generated a directory containing six plots:
 
 ![title](figures/FOXM1_E2F2.png)
 
-<legend><b>Figure 5</b> - Dual Survival Plot for FOXM1~E2F2 dual regulon. It shows the activity in the samples is positively correlated, but there is no additional hazard ratio information given by the Cox regression of the interaction. **a)** Sample ranking using differential Enrichment Score (dES) of regulon FOXM1. **b)** dES sample ranking for regulon E2F2 and a sample scatter plot, showing the ranking of each sample in both regulons. In this case, FOXM1 and E2F2 agree in sample stratification. **c)** Kaplan-Meier curves. The Interaction curve follows the individual regulons very closely. **d)** Cox regression plot. It doesn't show any association between the activity of these regulons or interaction and hazard ratio.
-</legend>
+<b>Figure 5</b> - Dual Survival Plot for FOXM1~E2F2 dual regulon. It shows the activity in the samples is positively correlated, but there is no additional hazard ratio information given by the Cox regression of the interaction. **a)** Sample ranking using differential Enrichment Score (dES) of regulon FOXM1. **b)** dES sample ranking for regulon E2F2 and a sample scatter plot, showing the ranking of each sample in both regulons. In this case, FOXM1 and E2F2 agree in sample stratification. **c)** Kaplan-Meier curves. The Interaction curve follows the individual regulons very closely. **d)** Cox regression plot. It doesn't show any association between the activity of these regulons or interaction and hazard ratio.
+
 
 
 ## Session Info

@@ -839,9 +839,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, att
     
     pngPanel(dual, path, png.res)
     
-    msg <- paste0("Plots successfull. ", "Files can be found in ", path, " directory. ", 
-                  "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
-    print(msg)
+    cat("Plots successfull.")
     
 })
 
