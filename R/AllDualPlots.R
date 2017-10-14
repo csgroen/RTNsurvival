@@ -303,7 +303,7 @@ dualCoxPlot <- function(dual, dualCoxTable, ...) {
     
     if (plotpdf)
     {
-        message("NOTE: 'PDF' file was generated")
+        message("NOTE: a 'PDF' file should be available at the working directory!\n")
         dev.off()
     }
     par(op)

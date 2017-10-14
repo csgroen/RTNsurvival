@@ -314,7 +314,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
                 show.KMlegend = show.KMlegend, KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
                 show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
             if (plotpdf) {
-                message("NOTE: 'PDF' file was generated")
+                message("NOTE: a 'PDF' file should be available at the working directory!\n")
                 dev.off()
             }
         }
