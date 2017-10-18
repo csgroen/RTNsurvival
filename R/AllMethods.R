@@ -314,7 +314,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
                 show.KMlegend = show.KMlegend, KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
                 show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
             if (plotpdf) {
-                message("NOTE: 'PDF' file was generated")
+                message("NOTE: a 'PDF' file should be available at the working directory!\n")
                 dev.off()
             }
         }
@@ -575,6 +575,8 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' for the two panels in plots [1] and [2].
 #' @param png.res a numeric value. It represents the resolution in ppi for the
 #' png panel.
+#' @param attribs.cex a numeric value. Represents the expansion factor for the
+#' attribs legend.
 #' 
 #' @examples
 #' # load survival data
@@ -618,10 +620,11 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' @aliases dualSurvivalPanel
 #' @export
 #' 
-setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, attribs = NULL, endpoint = 60,
+setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, 
+                                               attribs = NULL, endpoint = 60,
                    path = NULL,  nSections = 2, 
                    pal = "BrBG", excludeMid = FALSE, sectionsLegend = NULL,
-                   panelWidths = c(2,3), png.res = 150)
+                   panelWidths = c(2,3), png.res = 150, attribs.cex = 1)
 {
     
     .tns.checks(mbr, type = "MBR")
@@ -712,27 +715,29 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, att
     fname <- paste(path, "/", "1.dESregPlot_", regs[1], ".pdf", sep = "")
     pdf(file = fname, width = 3.897, height = 4.1335)
     dESregPlot(tns1, regs = regs[1], attribs = attribs, 
-               panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections)
+               panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections,
+               attribs.cex = attribs.cex)
     dev.off()
     
     fname <- paste(path, "/", ".1.dESregPlot_", regs[1], ".png", sep = "")
     png(filename = fname, width = 3.897*png.res, height = 4.1335*png.res, res = png.res)
     dESregPlot(tns1, regs = regs[1], attribs = attribs, 
                panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections,
-               xname = "a")
+               xname = "a", attribs.cex = attribs.cex)
     dev.off()
     
     fname <- paste(path, "/", "2.dESregPlot_", regs[2], ".pdf", sep = "")
     pdf(file = fname, width = 3.897, height = 4.1335)
     dESregPlot(tns2, regs = regs[2], attribs = attribs, 
-               panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections)
+               panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections,
+               attribs.cex = attribs.cex)
     dev.off()
     
     fname <- paste(path, "/", ".2.dESregPlot_", regs[2], ".png", sep = "")
     png(filename = fname, width = 3.897*png.res, height = 4.1335*png.res, res = png.res)
     dESregPlot(tns2, regs = regs[2], attribs = attribs, 
                panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections,
-               xname = "b")
+               xname = "b", attribs.cex = attribs.cex)
     dev.off()
     
     #----- KM plots (separate regs)
@@ -779,7 +784,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, att
     else {
         KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
                   title = "Interaction", ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections, pal = pal.cols,
-                  excludeMid = excludeMid)
+                  excludeMid = excludeMid, pval.pos = "bottomright")
         mode <- "agreement"
     }
     dev.off()
@@ -839,7 +844,9 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, att
     
     pngPanel(dual, path, png.res)
     
-    cat("Plots successfull.")
+    msg <- paste0("Plots successfull. ", "Files can be found in ", path, " directory. ", 
+                  "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
+    print(msg)
     
 })
 

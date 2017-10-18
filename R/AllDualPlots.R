@@ -69,7 +69,7 @@ pngPanel <- function(dual, path, res) {
 dESregPlot <- function (tns, regs = NULL, attribs = NULL, nSections = 2,
                         pal = "redblue", excludeMid = FALSE, flipcols = FALSE, 
                         panelWidths = c(2, 3), flipGraph = FALSE,
-                        xname = NULL) {
+                        xname = NULL, attribs.cex = 1) {
     
     dES.ylab = "Sample ranking"
     if (is.null(xname))
@@ -105,14 +105,15 @@ dESregPlot <- function (tns, regs = NULL, attribs = NULL, nSections = 2,
     
     #---plot
     .dESplot(EScores, survData, regs, attribs, pal, panelWidths, excludeMid, 
-             flipcols, groups, dES.ylab = dES.ylab, flipGraph = flipGraph, xname)
+             flipcols, groups, dES.ylab = dES.ylab, flipGraph = flipGraph, xname,
+             attribs.cex)
     par(mfrow=c(1,1))
     invisible(EScores)
 }
 
 .dESplot <- function(EScores, dt, reg, attribs, pal, widths,
                      excludeMid, flipcols, groups, dES.ylab, flipGraph,
-                     xname)
+                     xname, attribs.cex)
 {
     
     #-- organzing data
@@ -169,7 +170,7 @@ dESregPlot <- function (tns, regs = NULL, attribs = NULL, nSections = 2,
             par(mar = c(0, 5, 3, 1))
             image(attribs, col = c("grey95", "black"), axes = FALSE)
             axis(2, at = seq(0, 1, length.out = length(labs)), labels = labs, tcl = -0.2, 
-                 las = 2, lwd = 1.8, cex.axis = 1, mgp = c(3,0.3,0))
+                 las = 2, lwd = 1.8, cex.axis = attribs.cex, mgp = c(3,0.3,0))
             axis(3, at = seq(0,1,by = 1/(length(nms) - 1)), labels = nms, tcl = -0.2, las = 2, lwd = 1.8, cex.axis = 0.8,
                  mgp = c(3,0.1,0), las = 1)
             mtext(dES.ylab, 3, line = 1.5, cex = 1.2)
@@ -177,7 +178,7 @@ dESregPlot <- function (tns, regs = NULL, attribs = NULL, nSections = 2,
                 mtext(xname, 3, adj = -0.1, line = 1.5, cex = 2, font = 2)
             }
             else {
-                mtext(xname, 3, adj = -0.55, line = 1.5, cex = 1.7, font = 2)
+                mtext(xname, 3, adj = -0.45, line = 1.5, cex = 1.7, font = 2)
             }
             
             
@@ -186,14 +187,14 @@ dESregPlot <- function (tns, regs = NULL, attribs = NULL, nSections = 2,
             par(mar = c(5, 3.5, 1.9, 0))
             image(t(attribs), col = c("grey95", "black"), axes = FALSE)
             axis(1, at = seq(0, 1, length.out = length(labs)), labels = labs, tcl = -0.2, 
-                 las = 2, lwd = 1.8, cex.axis = 1, mgp = c(3,0.3,0))
+                 las = 2, lwd = 1.8, cex.axis = attribs.cex, mgp = c(3,0.3,0))
             axis(2, at = seq(0,1,by = 1/(length(nms) - 1)), labels = nms, tcl = -0.2, las = 2, lwd = 1.8, cex.axis = 0.8,
                  mgp = c(3,0.3,0))
-            mtext(dES.ylab, 2, line = 1.5, cex = 1.2)
+            mtext(dES.ylab, 2, line = 1.8, cex = 1.2)
             if(xname != reg) {
-                mtext(xname, 3, adj = 0, line = 0.3, cex = 2, font = 2)
+                mtext(xname, 3, adj = -0.4, line = 0.3, cex = 2, font = 2)
             } else {
-                mtext(xname, 3, adj = 0, line = 0.3, cex = 1.7, font = 2)
+                mtext(xname, 3, adj = 0.2, line = 0.3, cex = 1.7, font = 2)
             }
             
         }
@@ -303,7 +304,7 @@ dualCoxPlot <- function(dual, dualCoxTable, ...) {
     
     if (plotpdf)
     {
-        message("NOTE: 'PDF' file was generated")
+        message("NOTE: a 'PDF' file should be available at the working directory!\n")
         dev.off()
     }
     par(op)
@@ -395,7 +396,7 @@ KMregPlot <- function (tns, reg, nSections = 2, endpoint = 60, ylab = "Survival 
     res1 <- survfit(Surv(time, event) ~ class, data = ddt)
     if (y.axis & ylab != "") {
         if (title.cex > 1) {
-            par(mar = c(1.5, 3, 0, 0), mgp = c(2, 0.3, 0), mai = c(0.7,0.7,0,0.1))
+            par(mar = c(1.5, 3, 0, 0), mgp = c(2, 0.3, 0), mai = c(0.7,0.7,0.2,0.1))
             plot(res1, col = cols, lwd = 1.8, axes = FALSE, cex.lab = ylab.cex, cex = 1, mark.time = TRUE, 
                  ylab = ylab, xlab = "")
         }
@@ -586,7 +587,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
     limit <- length(samples)*0.02
     
     #--- upper color bar
-    par(mar = c(0,0,1.6,1.5))
+    par(mar = c(0,0,2,1.5))
     if (any(dES1$regstatus[,regs[1]] == nSections+1))
         stratcols <- rev(as.matrix(RColorBrewer::brewer.pal(nSections*2+1,"RdBu")))
     else 
@@ -616,7 +617,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
     z <- matrix(x, ncol = 1)
     
     image(x, y = 1, z, col = col.mat, axes=FALSE,xlab="",ylab="")
-    mtext(regs[1], 3, cex = 1.5, font = 2)
+    mtext(regs[1], 3, cex = 1.5, font = 2, line = 0.2)
     
     #--- side color bar
     if (any(dES2$regstatus[,regs[2]] == nSections+1))
@@ -624,7 +625,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
     else 
         stratcols <- rev(as.matrix(RColorBrewer::brewer.pal(nSections*2,"RdBu")))
     
-    par(mar = c(0.5,1.7,0,0))
+    par(mar = c(0.5,2,0,0))
     sections <- sort(unique(dES2$regstatus[, regs[2]]), decreasing = TRUE)
     y.pos <- rep(0, length(sections)-1)
     j <- 1
@@ -648,7 +649,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
     z <- matrix(1:ncol(samples.pos), nrow = 1)
     
     image(x = 1, y, z, col = col.mat, axes=FALSE,xlab="",ylab="")
-    mtext(regs[2], 2, cex = 1.5, font = 2)
+    mtext(regs[2], 2, cex = 1.5, font = 2, line = 0.2)
     
     
     #-- scatter plot

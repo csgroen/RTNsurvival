@@ -1,4 +1,3 @@
-setClassUnion("TNInull", members = c("TNI", "NULL"))
 setClassUnion("charnull", members = c("character", "NULL"))
 
 #' TNS: An S4 class for survival survival analysis using transcriptional 
@@ -41,7 +40,7 @@ setClassUnion("charnull", members = c("character", "NULL"))
 #' @exportClass TNS
 #'
 ## Class TNS (Transcriptional Network - Survival)
-setClass("TNS", representation(tni = "TNInull", survivalData = "data.frame", keycovar = "charnull", 
+setClass("TNS", representation(tni = "TNI", survivalData = "data.frame", keycovar = "charnull", 
     para = "list", EScores = "list", status = "character"), prototype = list(tni = NULL, 
 survivalData = data.frame(), keycovar = NULL, para = list(), EScores = list(), 
     status = character()))

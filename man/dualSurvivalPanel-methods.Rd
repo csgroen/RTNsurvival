@@ -9,7 +9,7 @@
 \S4method{dualSurvivalPanel}{MBR}(mbr, tns1, tns2 = NULL, dual,
   attribs = NULL, endpoint = 60, path = NULL, nSections = 2,
   pal = "BrBG", excludeMid = FALSE, sectionsLegend = NULL,
-  panelWidths = c(2, 3), png.res = 150)
+  panelWidths = c(2, 3), png.res = 150, attribs.cex = 1)
 }
 \arguments{
 \item{mbr}{an \linkS4class{MBR} object computed from
@@ -49,6 +49,9 @@ for the two panels in plots [1] and [2].}
 
 \item{png.res}{a numeric value. It represents the resolution in ppi for the
 png panel.}
+
+\item{attribs.cex}{a numeric value. Represents the expansion factor for the
+attribs legend.}
 }
 \value{
 A folder containing 5 pdf survival plots and one png survival panel

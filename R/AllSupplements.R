@@ -133,8 +133,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
     #-- plot
     tna.plot.gsea2(rtna, labPheno = aSample, tfs = regs, plotpdf = plotpdf, ...)
     if (verbose) 
-        message("- GSEA plot(s) for the selected sample and regulons should be 
-        available at the working directory!\n")
+        message("NOTE: a 'PDF' file should be available at the working directory!\n")
     
 }
 
@@ -446,7 +445,7 @@ pal3 <- function(nclass)
     
     if (plotpdf)
     {
-        message("NOTE: 'PDF' file was generated")
+        message("NOTE: a 'PDF' file should be available at the working directory!\n")
         dev.off()
     }
     par(op)
