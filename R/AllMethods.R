@@ -38,14 +38,11 @@ setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, t
     event = 2, samples = NULL) {
     #-- tni checks
     if (tni@status["Preprocess"] != "[x]") 
-        stop("NOTE: TNI object requires preprocessing in the 
-                       RTN package!")
+        stop("NOTE: TNI object requires preprocessing in the RTN package!")
     if (tni@status["Permutation"] != "[x]") 
-        stop("NOTE: TNI object requires permutation/bootstrap and 
-                       DPI filter in the RTN package!")
+        stop("NOTE: TNI object requires permutation/bootstrap and DPI filter in the RTN package!")
     if (tni@status["DPI.filter"] != "[x]") 
-        stop("NOTE: TNI object requires DPI filter in the RTN 
-                       package!")
+        stop("NOTE: TNI object requires DPI filter in the RTN package!")
     
     #-- missing
     if (missing(survivalData)) {
@@ -65,8 +62,7 @@ setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, t
     
     #-- other checks
     if (!all(samples %in% colnames(tni@gexp))) {
-        stop("all samples listed in 'survivalData' rownames must be 
-available in the 'tni' object!")
+        stop("all samples listed in 'survivalData' rownames must be available in the 'tni' object!")
     }
     
     #-- reorganize survivalData
@@ -281,8 +277,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     reglist <- colnames(tns@EScores$regstatus)
     if (!is.null(regs)) {
         if (!all(regs %in% reglist)) {
-            stop("NOTE: all names in 'regs' should be listed 
-                     in the slot 'EScores' of the 'tns' object!")
+            stop("NOTE: all names in 'regs' should be listed in the slot 'EScores' of the 'tns' object!")
         }
         reglist <- regs
     }
@@ -532,8 +527,7 @@ setMethod("tnsGet", "TNS", function(object, what)
         return(object@tni@regulatoryElements)
     }
     else {
-        stop("'what' must be one of: 'survivalData', 'EScores', 'TNI',
-             'keycovar' and 'regulatoryElements'.")
+        stop("'what' must be one of: 'survivalData', 'EScores', 'TNI', 'keycovar' and 'regulatoryElements'.")
     }
 })
 
@@ -673,8 +667,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
         all.regs <- unlist(strsplit(dual, "~"))
         if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
         {
-            stop("If tns2 is not given, all regulons used to compute duals must be
-                 present in `regulatoryElements` of tns1.")
+            stop("If tns2 is not given, all regulons used to compute duals must be present in `regulatoryElements` of tns1.")
         }
         tns2 <- tns1
     }
@@ -844,9 +837,9 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     
     pngPanel(dual, path, png.res)
     
-    msg <- paste0("Plots successfull. ", "Files can be found in ", path, " directory. ", 
+    msg <- paste0("NOTE: 'PDF' files should be available at the working directory ", "(see '",path,"' folder). ", 
                   "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
-    print(msg)
+    message(msg)
     
 })
 

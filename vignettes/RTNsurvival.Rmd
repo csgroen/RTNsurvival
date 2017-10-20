@@ -103,6 +103,7 @@ tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1", verbose = FALSE)
 An overview of regulon activity can be obtained by plotting a heatmap with all evaluated samples and regulons. First, we need to obtain the matrix of dES values from the TNS object. Then, we can plot the heatmap using the `pheatmap` function from the **pheatmap** package. In this example, we also illustrate how to incorporate sample features from the survival data.
 
 ```{r, eval = FALSE}
+library(pheatmap)
 enrichmentScores <- tnsGet(rtns, "EScores")
 survival.data <- tnsGet(rtns, "survivalData")
 annotationBars <- survival.data[,c("ER+", "ER-")]
@@ -150,7 +151,7 @@ The `dualsSurvivalPanel` method generated a directory containing six plots:
 </ul>
 
 ![title](figures/fig5.png)
-<b>Figure 5</b> - Dual Survival Plot for FOXM1~E2F2 dual regulon. It shows the regulon activity is positively correlated, but there is no additional hazard ratio information given by the Cox regression of the interaction. **a)** Sample ranking using differential Enrichment Score (dES) of regulon FOXM1. **b)** dES sample ranking for regulon E2F2 and a sample scatter plot, showing the ranking of each sample in both regulons. In this case, FOXM1 and E2F2 agree in sample stratification. **c)** Kaplan-Meier curves. The Interaction curve follows the individual regulons very closely. **d)** Cox regression plot. It doesn't show any association between the activity of these regulons or interaction and hazard ratio.
+<b>Figure 5</b> - Dual Survival Plot for MYB~PGR dual regulon. It shows the regulon activity is positively correlated, but there is no additional hazard ratio information given by the Cox regression of the interaction. **a)** Sample ranking using differential Enrichment Score (dES) of regulon MYB **b)** dES sample ranking for regulon PGR and a sample scatter plot, showing the ranking of each sample in both regulons. In this case, MYB and PGR agree in sample stratification. **c)** Kaplan-Meier curves. The Interaction curve follows the individual regulons very closely. **d)** Cox regression plot. It doesn't show any association between the activity of these regulons or interaction and hazard ratio.
 
 
 # Session information
