@@ -290,14 +290,16 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     
     #---plot
     if (plotbatch & plotpdf) {
-        pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), width = width, height = height)
-        for (reg in reglist) {
-            .survplot(EScores, survData, reg, fname, fpath, ylab, xlab, pal, panelWidths, 
-                plotpdf, excludeMid, flipcols, attribs, groups, endpoint, dES.ylab = dES.ylab, 
-                show.KMlegend = show.KMlegend, KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
-                show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
-        }
-        dev.off()
+      pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), width = width, height = height)
+      for (reg in reglist) {
+        .survplot(EScores, dt=survData, reg=reg, fname=fname, fpath=fpath, ylab=ylab, 
+                  xlab=xlab, pal=pal, panelWidths=panelWidths, plotpdf=plotpdf, 
+                  excludeMid=excludeMid, flipcols=flipcols, attribs=attribs, groups=groups, 
+                  endpoint=endpoint, dES.ylab = dES.ylab, show.KMlegend = show.KMlegend, 
+                  KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
+                  show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
+      }
+      dev.off()
     } else {
         for (reg in reglist) {
             if (plotpdf) {
@@ -364,8 +366,8 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
 #' 
 setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "coxplot", 
     fpath = ".", ylab = "Regulons and key covariates", xlab = "Hazard Ratio (95% CI)", 
-    qqkeycovar = FALSE, excludeMid = FALSE, width = 5, height = 5, xlim = c(0.2, 
-        10), sortregs = TRUE, plotpdf = TRUE) {
+    qqkeycovar = FALSE, excludeMid = FALSE, width = 5, height = 5, 
+    xlim = c(0.2, 10), sortregs = TRUE, plotpdf = TRUE) {
     
     #-- checks
     .tns.checks(tns, type = "status")
@@ -443,12 +445,13 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
             c(1, 1, 0.99, 1.01)
         } else {
             fm2 <- formula(paste(fm1, rg, sep = "+"))
-            summary(coxph(fm2, data = summary[!nas, ]))$conf.int[rg, , drop = FALSE]
+            res <- summary(coxph(fm2, data = summary[!nas, ]))
+            sts <- res$coefficients[,c("z","Pr(>|z|)")]
+            cbind(res$conf.int,sts)[rg, , drop = FALSE]
         }
     })
     resall <- t(resall)
-    dimnames(resall) = list(xregs, 
-                    c("exp(coef)", "exp(-coef)", "lower .95", "upper .95"))
+    dimnames(resall) = list(xregs, c("exp(coef)", "exp(-coef)", "lower .95", "upper .95","z","Pr(>|z|)"))
     if (sortregs) {
         resall <- resall[sort.list(resall[, 1]), ]
     }
@@ -456,7 +459,9 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
     #--- fit cox model for keycovars and adding to resall
     idx <- which.max(resall[, "exp(coef)"])
     fm2 <- formula(paste(fm1, rownames(resall)[idx], sep = "+"))
-    resref <- summary(coxph(fm2, data = summary))$conf.int
+    resref <- summary(coxph(fm2, data = summary))
+    sts <- resref$coefficients[,c("z","Pr(>|z|)")]
+    resref <- cbind(resref$conf.int,sts)
     resall <- rbind(resref[-nrow(resref), ], resall)
     rownames(resall)[1:length(keycovar)] <- tnsGet(tns, "keycovar")
     resall <- resall[nrow(resall):1, ]
@@ -471,7 +476,7 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
         height = height, xlim = xlim, xlab = xlab, ylab = ylab, plotpdf = plotpdf)
     
     #--- return
-    invisible(list(resall = resall, kvarlist = kvarlist))
+    invisible(resall)
     
 })
 

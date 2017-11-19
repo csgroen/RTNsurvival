@@ -168,7 +168,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
     
 }
 
-.survplot <- function(EScores, dt, reg, fname, fpath, ylab, xlab, pal, widths, plotpdf, 
+.survplot <- function(EScores, dt, reg, fname, fpath, ylab, xlab, pal, panelWidths, plotpdf, 
     excludeMid, flipcols, attribs, groups, endpoint, dES.ylab, show.KMlegend, KMlegend.pos, 
     KMlegend.cex, show.pval, pval.cex, pval.pos)
     {
@@ -213,15 +213,15 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
     nms[length(nms)] <- np
     
     panels <- c(TRUE, !is.null(attribs), TRUE)
-    layout(matrix(seq_len(sum(panels)), 1, sum(panels)), widths = widths[panels])
+    layout(matrix(seq_len(sum(panels)), 1, sum(panels)), widths = panelWidths[panels])
     par(mgp = c(2.5, 0.4, 0), mar = c(6.5, 5, 3, 0.7))
     xlim <- range(tumours) + c(-0.5, 0.5)
     
     #--- first panel plot (Sample statification)
-    barplot(tumours, space = 0, xlim = c(-2, 2), axes = FALSE, cex.lab = 1.2, col = cols[as.factor(regstatus)], 
-        hor
- = TRUE, border = NA, axisnames = FALSE, ylab = dES.ylab, xlab = "", 
-        beside = TRUE, lwd = 1)
+    barplot(tumours, space = 0, xlim = c(-2, 2), axes = FALSE, cex.lab = 1.2, 
+            col = cols[as.factor(regstatus)], horiz = TRUE, border = NA, 
+            axisnames = FALSE, ylab = dES.ylab, xlab = "", 
+            beside = TRUE, lwd = 1)
     mtext("Enrichment score\n( dES )", 1, adj = 0.5, line = 3, cex = 0.8)
     mtext(reg, 3, adj = 0.1, line = -0.5, cex = 0.8)
     axis(2, at = nms, labels = nms, tcl = -0.2, las = 2, lwd = 1.8, cex.axis = 1.2)
@@ -267,44 +267,39 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
     #-- survival analysis
     res1 <- survfit(Surv(time, event) ~ class, data = ddt)
     par(mar = c(6.5, 5, 3, 1))
-    plot(res1, col = cols, lwd = 1.8, axes = FALSE, cex.lab = 1.2, cex = 0.5, mark.time = TRUE, 
+    plot(res1, col = cols, lwd = 1.8, axes = FALSE, cex.lab = 1.2, cex = 0.5, mark.time = TRUE,
         ylab = ylab, xlab = "")
     mtext(xlab, 1, adj = 0.5, line = 2, cex = 0.8)
     labs <- as.integer(seq(0, endpoint, length.out = 4))
-    if (!endpoint %in% labs) 
+    if (!endpoint %in% labs)
         labs <- pretty(c(0, endpoint))
     axis(1, at = labs, labels = labs, tcl = -0.2, las = 1, lwd = 1.8, cex.axis = 1.2)
     axis(2, tcl = -0.2, las = 2, lwd = 1.8, cex.axis = 1.2)
     #---log-rank test
     if (nclass > 1)
     {
-        res2 <- survdiff(Surv(time, event) ~ class, data = ddt)
-        pval <- 1 - pchisq(res2$chisq, length(res2$n) - 1)
-        #---legends
-        if (nclass == 2)
-        {
-            legs <- paste(c("Positive dES", "Negative dES")[1:length(sections)], 
-                ": ", res2$n, " (", res2$obs, ")", sep = "")
-        } else if (nclass == 3)
-        {
-            legs <- paste(c("Positive dES", "undetermined", "Negative dES")[1:length(sections)], 
-                ": ", res2$n, " (", res2$obs, ")", sep = "")
-        } else
-        {
-            legs <- paste("Section ", 1:length(sections), ": ", res2$n, "(", res2$obs, 
-                ")", sep = "")
-        }
-        pval <- paste("Logrank P: ", format(pval, digits = 3, scientific = TRUE))
-        if (show.KMlegend)
-        {
-            legend(KMlegend.pos, legend = legs, col = cols, bty = "n", pch = 15, 
-                cex = KMlegend.cex, pt.cex = 1.5)
-        }
-        if (show.pval)
-        {
-            legend(pval.pos, cex = pval.cex, legend = pval, bty = "n", adj = c(0, 
-                -0.5))
-        }
+      res2 <- survdiff(Surv(time, event) ~ class, data = ddt)
+      pval <- 1 - pchisq(res2$chisq, length(res2$n) - 1)
+      #---legends
+      if (nclass == 2)
+      {
+        legs <- paste(c("Positive dES", "Negative dES")[1:length(sections)], ": ", res2$n, " (", res2$obs, ")", sep = "")
+      } else if (nclass == 3)
+      {
+        legs <- paste(c("Positive dES", "undetermined", "Negative dES")[1:length(sections)], ": ", res2$n, " (", res2$obs, ")", sep = "")
+      } else
+      {
+        legs <- paste("Section ", 1:length(sections), ": ", res2$n, "(", res2$obs,")", sep = "")
+      }
+      pval <- paste("Logrank P: ", format(pval, digits = 3, scientific = TRUE))
+      if (show.KMlegend)
+      {
+        legend(KMlegend.pos, legend = legs, col = cols, bty = "n", pch = 15, cex = KMlegend.cex, pt.cex = 1.5)
+      }
+      if (show.pval)
+      {
+        legend(pval.pos, cex = pval.cex, legend = pval, bty = "n", adj = c(0, -0.5))
+      }
     }
     par(op)
 }
@@ -379,8 +374,8 @@ pal3 <- function(nclass)
     cols
 }
 
-.plotCox = function(resall, regs, keycovar, filen, width, height, xlim, xlab, ylab, 
-    plotpdf)
+.plotCox = function(resall, regs, keycovar, filen, width, height, 
+                    xlim, xlab, ylab, plotpdf)
     {
     #--- get colors
     # ptreds<-rev(colorRampPalette(brewer.pal(9,'Reds'))(11))
@@ -419,10 +414,8 @@ pal3 <- function(nclass)
     #--- plot graph
     nIN = 2
     nOUT = nrow(resall) + 1
-    op <- par(no.readonly = TRUE)
     ylim <- c(0, nOUT + 1)
-    if (plotpdf) 
-        pdf(file = filen, width = width, height = height)
+    if (plotpdf) pdf(file = filen, width = width, height = height)
     par(mai = c(0.4, 1.2 * len, 1, 0.7), mgp = c(3, 0.5, 0), yaxs = "i", xaxs = "i")
     plot(NA, log = "x", xlim = xlim, ylim = ylim, axes = FALSE, ylab = "", xlab = "")
     segments(xlim[1], nIN:nOUT, resall[, 3], col = "grey85", lwd = 1.5, lty = "21", 
@@ -448,7 +441,6 @@ pal3 <- function(nclass)
         message("NOTE: a 'PDF' file should be available at the working directory!\n")
         dev.off()
     }
-    par(op)
     invisible(resall)
     
 }
