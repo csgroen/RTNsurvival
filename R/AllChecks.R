@@ -93,11 +93,11 @@
             stop("'fpath' must be a single character.", call. = FALSE)
         
         if (!dir.exists(object1)) 
-            stop("fpath does not lead to an existing directory.", call. = FALSE)
+            stop("'fpath' does not lead to an existing directory.", call. = FALSE)
         
     } else if (type == "Path2") {
         if (!is.singleString(object1) & !is.null(object1)) {
-            stop("`path` must be a single string or NULL.", call. = FALSE)
+            stop("'path' must be a single string or NULL.", call. = FALSE)
         }
     }
     
@@ -105,6 +105,13 @@
     {
         if (!is.singleString(object1)) 
             stop("'fname' must be a single character.", call. = FALSE)
+      #---check name
+      validname <- gsub("[^0-9A-Za-z\\.]", '_',object1)
+      if(validname!=object1){
+        stop("NOTE: please provide 'fname' without special charaters or path information!",
+             call. = FALSE)
+      }
+      
     } else if (type == "Ylab")
     {
         if (!is.singleString(object1)) 

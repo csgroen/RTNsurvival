@@ -71,7 +71,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
     if (!is.null(regs))
     {
         if (!all(regs %in% colnames(object@EScores$dif))) 
-            stop("'regs' are not present in Enrichment Scores in the TNS object")
+            stop("NOTE: one or more 'regs' not listed in Enrichment Scores matrix in the TNS object")
     } else
     {
         all.regs <- object@EScores$dif[aSample, ]
@@ -207,8 +207,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
     dp <- nms[2] - nms[1]
     pp <- length(nms)
     
-    if ((abs(nms[pp] - np)/dp) > 0.6) 
-        nms <- nms[-pp]
+    if ((abs(nms[pp] - np)/dp) > 0.6) nms <- nms[-pp]
     
     nms[length(nms)] <- np
     
@@ -222,7 +221,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
             col = cols[as.factor(regstatus)], horiz = TRUE, border = NA, 
             axisnames = FALSE, ylab = dES.ylab, xlab = "", 
             beside = TRUE, lwd = 1)
-    mtext("Enrichment score\n( dES )", 1, adj = 0.5, line = 3, cex = 0.8)
+    mtext("Regulon activity (dES)", 1, adj = 0.5, line = 2, cex = 0.8)
     mtext(reg, 3, adj = 0.1, line = -0.5, cex = 0.8)
     axis(2, at = nms, labels = nms, tcl = -0.2, las = 2, lwd = 1.8, cex.axis = 1.2)
     axis(1, tcl = -0.2, lwd = 1.8, cex.axis = 1.2)
@@ -260,8 +259,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
         nclass <- nclass - 1
     }
     sections <- sort(unique(regstatus))
-    if (length(sections) < length(cols)) 
-        cols <- cols[-((length(cols) + 1)/2)]
+    if (length(sections) < length(cols)) cols <- cols[-((length(cols) + 1)/2)]
     ddt <- dt[names(regstatus), ]
     ddt$class <- regstatus
     #-- survival analysis
@@ -271,15 +269,16 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
         ylab = ylab, xlab = "")
     mtext(xlab, 1, adj = 0.5, line = 2, cex = 0.8)
     labs <- as.integer(seq(0, endpoint, length.out = 4))
-    if (!endpoint %in% labs)
-        labs <- pretty(c(0, endpoint))
+    if (!endpoint %in% labs) labs <- pretty(c(0, endpoint))
     axis(1, at = labs, labels = labs, tcl = -0.2, las = 1, lwd = 1.8, cex.axis = 1.2)
     axis(2, tcl = -0.2, las = 2, lwd = 1.8, cex.axis = 1.2)
     #---log-rank test
+    lrstats <- c(chisq=NA, p=NA)
     if (nclass > 1)
     {
       res2 <- survdiff(Surv(time, event) ~ class, data = ddt)
       pval <- 1 - pchisq(res2$chisq, length(res2$n) - 1)
+      lrstats[] <- c(res2$chisq,pval)
       #---legends
       if (nclass == 2)
       {
@@ -302,6 +301,7 @@ tnsPlotGSEA2 <- function(object, aSample, regs = NULL, refsamp = NULL, log = FAL
       }
     }
     par(op)
+    return(lrstats)
 }
 pal1 <- function(nclass)
 {
@@ -404,9 +404,9 @@ pal3 <- function(nclass)
     #---
     urd <- function(d, x)
     {
-        lxd <- log10(x/d)
-        rlxd <- unique(c(floor(lxd), ceiling(lxd)))
-        d * 10^rlxd
+      lxd <- log10(x/d)
+      rlxd <- unique(c(floor(lxd), ceiling(lxd)))
+      d * 10^rlxd
     }
     xlabs <- .prettylog(xlim)
     xlim <- range(xlim)
@@ -432,7 +432,7 @@ pal3 <- function(nclass)
     labs[labs == "LN"] <- "LN+"
     mtext(text = labs, side = 2, at = nIN:nOUT, las = 2, cex = 0.8)
     par(xpd = TRUE)
-    legend(y = 0, x = 1, ncol = 2, legend = c("covariates", "associated, HR<1", "not associated", 
+    legend(y = 0, x = 1, ncol = 2, legend = c("key covariates", "associated, HR<1", "not associated", 
         "associated, HR>1"), col = pal, pch = 18, lwd = 1.2, xjust = 0.5, yjust = 0.5, 
         bty = "n", cex = 0.65, pt.cex = 0.9)
     
