@@ -35,55 +35,52 @@
 #' @export
 #' 
 setMethod("tnsPreprocess", "TNI", function(tni, survivalData, keycovar = NULL, time = 1, 
-    event = 2, samples = NULL) {
-    #-- tni checks
-    if (tni@status["Preprocess"] != "[x]") 
-        stop("NOTE: TNI object requires preprocessing in the 
-                       RTN package!")
-    if (tni@status["Permutation"] != "[x]") 
-        stop("NOTE: TNI object requires permutation/bootstrap and 
-                       DPI filter in the RTN package!")
-    if (tni@status["DPI.filter"] != "[x]") 
-        stop("NOTE: TNI object requires DPI filter in the RTN 
-                       package!")
-    
-    #-- missing
-    if (missing(survivalData)) {
-        res <- try(tni.get(tni, "colAnnotation"), silent = TRUE)
-        if (class(res) == "try-error")
-            stop("Must provide a 'survivalData' object.")
-        else
-            survivalData <- res
-    }
-    
-    #-- par checks
-    .tns.checks(survivalData, type = "survivalData")
-    time = .tns.checks(time, survivalData, type = "Time")
-    event = .tns.checks(event, survivalData, type = "Event")
-    .tns.checks(keycovar, survivalData, "Keycovars")
-    samples = .tns.checks(samples, survivalData, type = "Samples")
-    
-    #-- other checks
-    if (!all(samples %in% colnames(tni@gexp))) {
-        stop("all samples listed in 'survivalData' rownames must be 
-available in the 'tni' object!")
-    }
-    
-    #-- reorganize survivalData
-    idx <- c(time, event)
-    te.data <- survivalData[, idx]
-    survivalData <- survivalData[, -idx]
-    survivalData <- cbind(te.data, survivalData)
-    names(survivalData)[1:2] <- c("time", "event")
-    survivalData <- survivalData[samples, ]
-    
-    #-- making TNS object
-    object <- new("TNS", tni = tni, survivalData = survivalData, keycovar = keycovar)
-    
-    #-- status update
-    object <- tns.set(object, what = "status-1")
-    
-    object
+                                           event = 2, samples = NULL) {
+  #-- tni checks
+  tni <- upgradeTNI(tni)
+  if (tni@status["Preprocess"] != "[x]") 
+    stop("NOTE: TNI object requires preprocessing in the RTN package!")
+  if (tni@status["Permutation"] != "[x]") 
+    stop("NOTE: TNI object requires permutation/bootstrap and DPI filter in the RTN package!")
+  if (tni@status["DPI.filter"] != "[x]") 
+    stop("NOTE: TNI object requires DPI filter in the RTN package!")
+  
+  #-- missing
+  if (missing(survivalData)) {
+    res <- try(tni.get(tni, "colAnnotation"), silent = TRUE)
+    if (class(res) == "try-error")
+      stop("Must provide a 'survivalData' object.")
+    else
+      survivalData <- res
+  }
+  
+  #-- par checks
+  .tns.checks(survivalData, type = "survivalData")
+  time = .tns.checks(time, survivalData, type = "Time")
+  event = .tns.checks(event, survivalData, type = "Event")
+  .tns.checks(keycovar, survivalData, "Keycovars")
+  samples = .tns.checks(samples, survivalData, type = "Samples")
+  
+  #-- other checks
+  if (!all(samples %in% colnames(tni@gexp))) {
+    stop("all samples listed in 'survivalData' rownames must be available in the 'tni' object!")
+  }
+  
+  #-- reorganize survivalData
+  idx <- c(time, event)
+  te.data <- survivalData[, idx]
+  survivalData <- survivalData[, -idx]
+  survivalData <- cbind(te.data, survivalData)
+  names(survivalData)[1:2] <- c("time", "event")
+  survivalData <- survivalData[samples, ]
+  
+  #-- making TNS object
+  object <- new("TNS", tni = tni, survivalData = survivalData, keycovar = keycovar)
+  
+  #-- status update
+  object <- tns.set(object, what = "status-1")
+  
+  object
 })
 
 
@@ -191,7 +188,7 @@ setMethod("tnsGSEA2", "TNS", function(tns, ...) {
 #' the third panel. One of: 'bottomright', 'bottom', 'bottomleft', 'left', 
 #' 'topleft', 'top', 'topright', 'right' and 'center'.
 #' 
-#' @return A plot, showing the graphical analysis of provided survival data.
+#' @return A plot, showing the graphical analysis of provided survival data, including log-rank statistics.
 #' @examples
 #' # load survival data
 #' data(survival.data)
@@ -281,8 +278,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     reglist <- colnames(tns@EScores$regstatus)
     if (!is.null(regs)) {
         if (!all(regs %in% reglist)) {
-            stop("NOTE: all names in 'regs' should be listed 
-                     in the slot 'EScores' of the 'tns' object!")
+            stop("NOTE: all names in 'regs' should be listed in the slot 'EScores' of the 'tns' object!")
         }
         reglist <- regs
     }
@@ -293,34 +289,53 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     validregs <- colnames(EScores$regstatus)[!idx]
     reglist <- reglist[reglist %in% validregs]
     
+    #--- remove invalid string
+    fname <- gsub(".pdf", '',fname, ignore.case = TRUE)
+    
     #---plot
     if (plotbatch & plotpdf) {
-        pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), width = width, height = height)
-        for (reg in reglist) {
-            .survplot(EScores, survData, reg, fname, fpath, ylab, xlab, pal, panelWidths, 
-                plotpdf, excludeMid, flipcols, attribs, groups, endpoint, dES.ylab = dES.ylab, 
-                show.KMlegend = show.KMlegend, KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
-                show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
-        }
-        dev.off()
+      file.path(fpath,fname,".pdf", )
+      pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), 
+          width = width, height = height)
+      logrank <- sapply(reglist, function(reg){
+        .survplot(EScores, dt=survData, reg=reg, fname=fname, fpath=fpath, 
+                  ylab=ylab, xlab=xlab, pal=pal, panelWidths=panelWidths, 
+                  plotpdf=plotpdf, excludeMid=excludeMid, flipcols=flipcols, 
+                  attribs=attribs, groups=groups, endpoint=endpoint, 
+                  dES.ylab = dES.ylab, show.KMlegend = show.KMlegend, 
+                  KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
+                  show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
+      })
+      dev.off()
     } else {
-        for (reg in reglist) {
-            if (plotpdf) {
-                pdf(file = paste(fpath, "/", reg, fname, ".pdf", sep = ""), width = width, 
-                  height = height)
-            }
-            .survplot(EScores, survData, reg, fname, fpath, ylab, xlab, pal, panelWidths, 
-                plotpdf, excludeMid, flipcols, attribs, groups, endpoint, dES.ylab = dES.ylab, 
-                show.KMlegend = show.KMlegend, KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
-                show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
-            if (plotpdf) {
-                message("NOTE: a 'PDF' file should be available at the working directory!\n")
-                dev.off()
-            }
+      logrank <- sapply(reglist, function(reg){
+        if (plotpdf) {
+          pdf(file = paste(fpath, "/", reg, fname, ".pdf", sep = ""), 
+              width = width, height = height)
         }
+        res <- .survplot(EScores, dt=survData, reg=reg, fname=fname, fpath=fpath, 
+                         ylab=ylab, xlab=xlab, pal=pal, panelWidths=panelWidths, 
+                         plotpdf=plotpdf, excludeMid=excludeMid, flipcols=flipcols, 
+                         attribs=attribs, groups=groups, endpoint=endpoint, 
+                         dES.ylab = dES.ylab, show.KMlegend = show.KMlegend, 
+                         KMlegend.pos = KMlegend.pos, KMlegend.cex = KMlegend.cex, 
+                         show.pval = show.pval, pval.cex = pval.cex, pval.pos = pval.pos)
+        if (plotpdf) dev.off()
+        return(res)
+      })
     }
-    
-    invisible(list(EScores = EScores, survivalData = survData))
+    if (plotpdf) {
+      tp1 <- c("NOTE: 'PDF' file(s) should be available either in the working directory or\n")
+      tp2 <- c("in a user's custom directory!\n")
+      message(tp1,tp2)
+    }
+    #---
+    logrank <- t(logrank)
+    logrank <- logrank[sort.list(logrank[,"p"]),, drop=FALSE]
+    logrank <- data.frame(logrank)
+    colnames(logrank) <- c("chisq","log_rank_p")
+    #---
+    invisible(list(EScores = EScores, survivalData = survData, logrankStats=logrank))
 })
 
 
@@ -348,7 +363,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
 #' @param sortregs a logical value. If TRUE, regulons are sorted from most 
 #' negatively associated with hazard to most positively associated with hazard.
 #' @param plotpdf a logical value.
-#' @return A Cox hazard model plot. If TRUE, generates a pdf plot.
+#' @return A Cox hazard model plot and statistics.
 #' @examples
 #' # load survival data
 #' data(survival.data)
@@ -369,8 +384,8 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
 #' 
 setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "coxplot", 
     fpath = ".", ylab = "Regulons and key covariates", xlab = "Hazard Ratio (95% CI)", 
-    qqkeycovar = FALSE, excludeMid = FALSE, width = 5, height = 5, xlim = c(0.2, 
-        10), sortregs = TRUE, plotpdf = TRUE) {
+    qqkeycovar = FALSE, excludeMid = FALSE, width = 5, height = 5, 
+    xlim = c(0.2, 10), sortregs = TRUE, plotpdf = TRUE) {
     
     #-- checks
     .tns.checks(tns, type = "status")
@@ -419,15 +434,15 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
     summary <- cbind(survData[rownames(dif), ], dif)
     
     #--- set keycovar by quantile
-    kvarlist <- list()
     if (qqkeycovar) {
         for (kvar in tns@keycovar) {
             tp <- summary[[kvar]]
-            ql <- quantile(tp, c(0.25, 0.75), na.rm = TRUE)
-            tp[tp < ql[1]] <- NA
-            tp[tp > ql[2]] <- NA
-            summary[[kvar]] <- tp
-            kvarlist[[kvar]] <- ql
+            if(is.numeric(tp)){
+              ql <- quantile(tp, c(0.25, 0.75), na.rm = TRUE)
+              tp[tp < ql[1]] <- NA
+              tp[tp > ql[2]] <- NA
+              summary[[kvar]] <- tp
+            } 
         }
     }
     
@@ -448,12 +463,13 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
             c(1, 1, 0.99, 1.01)
         } else {
             fm2 <- formula(paste(fm1, rg, sep = "+"))
-            summary(coxph(fm2, data = summary[!nas, ]))$conf.int[rg, , drop = FALSE]
+            res <- summary(coxph(fm2, data = summary[!nas, ]))
+            sts <- res$coefficients[,c("z","Pr(>|z|)")]
+            cbind(res$conf.int,sts)[rg, , drop = FALSE]
         }
     })
     resall <- t(resall)
-    dimnames(resall) = list(xregs, 
-                    c("exp(coef)", "exp(-coef)", "lower .95", "upper .95"))
+    dimnames(resall) = list(xregs, c("exp(coef)", "exp(-coef)", "lower .95", "upper .95","z","Pr(>|z|)"))
     if (sortregs) {
         resall <- resall[sort.list(resall[, 1]), ]
     }
@@ -461,7 +477,9 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
     #--- fit cox model for keycovars and adding to resall
     idx <- which.max(resall[, "exp(coef)"])
     fm2 <- formula(paste(fm1, rownames(resall)[idx], sep = "+"))
-    resref <- summary(coxph(fm2, data = summary))$conf.int
+    resref <- summary(coxph(fm2, data = summary))
+    sts <- resref$coefficients[,c("z","Pr(>|z|)")]
+    resref <- cbind(resref$conf.int,sts)
     resall <- rbind(resref[-nrow(resref), ], resall)
     rownames(resall)[1:length(keycovar)] <- tnsGet(tns, "keycovar")
     resall <- resall[nrow(resall):1, ]
@@ -476,7 +494,9 @@ setMethod("tnsCox", "TNS", function(tns, regs = NULL, endpoint = 60, fname = "co
         height = height, xlim = xlim, xlab = xlab, ylab = ylab, plotpdf = plotpdf)
     
     #--- return
-    invisible(list(resall = resall, kvarlist = kvarlist))
+    resall <- resall[,c(1,3,4,6)]
+    colnames(resall)[1] <- "HR"
+    invisible(resall)
     
 })
 
@@ -532,8 +552,7 @@ setMethod("tnsGet", "TNS", function(object, what)
         return(object@tni@regulatoryElements)
     }
     else {
-        stop("'what' must be one of: 'survivalData', 'EScores', 'TNI',
-             'keycovar' and 'regulatoryElements'.")
+        stop("'what' must be one of: 'survivalData', 'EScores', 'TNI', 'keycovar' and 'regulatoryElements'.")
     }
 })
 
@@ -673,8 +692,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
         all.regs <- unlist(strsplit(dual, "~"))
         if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
         {
-            stop("If tns2 is not given, all regulons used to compute duals must be
-                 present in `regulatoryElements` of tns1.")
+            stop("If tns2 is not given, all regulons used to compute duals must be present in `regulatoryElements` of tns1.")
         }
         tns2 <- tns1
     }
@@ -844,9 +862,9 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     
     pngPanel(dual, path, png.res)
     
-    msg <- paste0("Plots successfull. ", "Files can be found in ", path, " directory. ", 
+    msg <- paste0("NOTE: 'PDF' files should be available at the working directory ", "(see '",path,"' folder). ", 
                   "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
-    print(msg)
+    message(msg)
     
 })
 

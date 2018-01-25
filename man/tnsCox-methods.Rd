@@ -48,7 +48,7 @@ negatively associated with hazard to most positively associated with hazard.}
 \item{plotpdf}{a logical value.}
 }
 \value{
-A Cox hazard model plot. If TRUE, generates a pdf plot.
+A Cox hazard model plot and statistics.
 }
 \description{
 Run Cox multivariate regression for regulons and key covariables.

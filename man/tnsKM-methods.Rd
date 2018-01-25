@@ -91,7 +91,7 @@ the third panel. One of: 'bottomright', 'bottom', 'bottomleft', 'left',
 'topleft', 'top', 'topright', 'right' and 'center'.}
 }
 \value{
-A plot, showing the graphical analysis of provided survival data.
+A plot, showing the graphical analysis of provided survival data, including log-rank statistics.
 }
 \description{
 Makes a 2 or 3 panel plot for survival analysis. The first panel shows the
