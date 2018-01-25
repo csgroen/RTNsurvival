@@ -295,7 +295,11 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     
     #---plot
     if (plotbatch & plotpdf) {
+<<<<<<< refs/remotes/upstream/master
       file.path(fpath,fname,".pdf")
+=======
+      file.path(fpath,fname,".pdf", )
+>>>>>>> Version bump to 1.3.4
       pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), 
           width = width, height = height)
       logrank <- sapply(reglist, function(reg){
