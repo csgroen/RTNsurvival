@@ -32,9 +32,8 @@
 #' library(RTNduals)
 #' tni <- tnsGet(stns, "TNI")
 #' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
-#' mbr <- mbrAssociation(mbr, prob = 0.75)
-#' mbr <- mbrDuals(mbr)
-#' results <- mbrGet(mbr, what="dualsInformation")
+#' mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
+#' results <- mbrGet(mbr, what="dualsCorrelation")
 #' 
 #' # create dual Cox regression
 #' dualCox <- dualCoxTable(mbr, stns, verbose = FALSE)
@@ -42,7 +41,7 @@
 #' @seealso \code{\link[RTNduals:tni2mbrPreprocess]{tni2mbrPreprocess}} for all 
 #' plot parameters
 #' @return A matrix containing the Cox regression results for all given duals
-#' @importFrom RTNduals tni2mbrPreprocess mbrAssociation mbrDuals mbrGet
+#' @importFrom RTNduals tni2mbrPreprocess mbrAssociation mbrPriorEvidenceTable mbrGet
 #' @export
 
 dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,

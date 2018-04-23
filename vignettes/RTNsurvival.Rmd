@@ -126,13 +126,11 @@ The workflow of the **RTNduals** can be used to infer dual TF-TF regulons, using
 ```{r}
 library(RTNduals)
 smbr <- tni2mbrPreprocess(stni, stni, verbose = FALSE)
-smbr <- mbrAssociation(smbr, prob = 0.75, verbose = FALSE)
-smbr <- mbrDuals(smbr, verbose = FALSE)
-mbrGet(smbr, "dualsInformation")
+smbr <- mbrAssociation(smbr, pValueCutoff = 0.05, verbose = FALSE)
+mbrGet(smbr, "dualsCorrelation")
 ```
 
-The `smbr` is an object of `MBR-class`, containing the motifs between the regulons represented in the `stni` object. As `prob` was set to 75%, only the 25% most significant inferred duals are shown in the results.
-
+The `smbr` is an object of `MBR-class`, containing the motifs between the regulons represented in the `stni` object. 
 Now, since the `rtns` object and `smbr` object were computed from the same expression matrix, we can use the survival information for that cohort in conjunction with the duals information.
 
 ```{r, eval = FALSE}

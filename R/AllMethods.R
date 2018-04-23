@@ -29,6 +29,7 @@
 #' @seealso \code{\link[RTN:tni.preprocess]{tni.preprocess}} for similar 
 #' preprocessing.
 #' @import methods
+#' @importFrom RTN upgradeTNI
 #' @docType methods
 #' @rdname tnsPreprocess-methods
 #' @aliases tnsPreprocess
@@ -294,7 +295,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     
     #---plot
     if (plotbatch & plotpdf) {
-      file.path(fpath,fname,".pdf", )
+      file.path(fpath,fname,".pdf")
       pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), 
           width = width, height = height)
       logrank <- sapply(reglist, function(reg){
@@ -614,8 +615,7 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' library(RTNduals)
 #' tni <- tnsGet(stns, "TNI")
 #' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
-#' mbr <- mbrAssociation(mbr, prob = 0.75)
-#' mbr <- mbrDuals(mbr)
+#' mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 #' duals <- mbrGet(mbr, what="dualRegulons")
 #' 
 #' # create panel plot

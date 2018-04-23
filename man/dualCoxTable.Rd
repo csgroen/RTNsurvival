@@ -50,9 +50,8 @@ stns <- tnsGSEA2(stns, verbose=FALSE)
 library(RTNduals)
 tni <- tnsGet(stns, "TNI")
 mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
-mbr <- mbrAssociation(mbr, prob = 0.75)
-mbr <- mbrDuals(mbr)
-results <- mbrGet(mbr, what="dualsInformation")
+mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
+results <- mbrGet(mbr, what="dualsCorrelation")
 
 # create dual Cox regression
 dualCox <- dualCoxTable(mbr, stns, verbose = FALSE)
