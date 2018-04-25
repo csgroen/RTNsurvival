@@ -487,7 +487,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
         cols <- RColorBrewer::brewer.pal(nSections*4, pal)
     
     if (mode == "agreement"){
-        
+        cols <- cols
         bgcol <- sapply(samples, function(sample) {
             #-- get sample stratums
             strat1 <- dES1$regstatus[sample,regs[1]]
