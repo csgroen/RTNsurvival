@@ -86,8 +86,7 @@ stns <- tnsGSEA2(stns, verbose=FALSE)
 library(RTNduals)
 tni <- tnsGet(stns, "TNI")
 mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
-mbr <- mbrAssociation(mbr, prob = 0.75)
-mbr <- mbrDuals(mbr)
+mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 duals <- mbrGet(mbr, what="dualRegulons")
 
 # create panel plot

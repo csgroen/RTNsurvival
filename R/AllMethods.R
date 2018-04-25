@@ -29,6 +29,7 @@
 #' @seealso \code{\link[RTN:tni.preprocess]{tni.preprocess}} for similar 
 #' preprocessing.
 #' @import methods
+#' @importFrom RTN upgradeTNI
 #' @docType methods
 #' @rdname tnsPreprocess-methods
 #' @aliases tnsPreprocess
@@ -294,7 +295,7 @@ setMethod("tnsKM", "TNS", function(tns, regs = NULL, attribs = NULL, nSections =
     
     #---plot
     if (plotbatch & plotpdf) {
-      file.path(fpath,fname,".pdf", )
+      file.path(fpath,fname,".pdf")
       pdf(file = paste(fpath, "/", fname, ".pdf", sep = ""), 
           width = width, height = height)
       logrank <- sapply(reglist, function(reg){
@@ -614,8 +615,7 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' library(RTNduals)
 #' tni <- tnsGet(stns, "TNI")
 #' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
-#' mbr <- mbrAssociation(mbr, prob = 0.75)
-#' mbr <- mbrDuals(mbr)
+#' mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 #' duals <- mbrGet(mbr, what="dualRegulons")
 #' 
 #' # create panel plot
@@ -632,8 +632,9 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' @importFrom png readPNG
 #' @importFrom graphics rasterImage box
 #' @importFrom grDevices png
-#' @importFrom stats lm cor
+#' @importFrom stats lm cor as.formula
 #' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom survival coxph
 #' @docType methods
 #' @rdname dualSurvivalPanel-methods
 #' @aliases dualSurvivalPanel
@@ -681,8 +682,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
         if(!dir.exists(dual))
             dir.create(dual)
         path <- dual
-    }
-    else if(!dir.exists(path)) {
+    } else if(!dir.exists(path)) {
         dir.create(path)
     }
     
@@ -695,14 +695,12 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
             stop("If tns2 is not given, all regulons used to compute duals must be present in `regulatoryElements` of tns1.")
         }
         tns2 <- tns1
-    }
-    else {
+    } else {
         tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
         if (!(regs[1] %in% tns1.reg.el) & !(regs[1] %in% names(tns1.reg.el))){
             if(!(regs[2] %in% tns1.reg.el) & !(regs[2] %in% names(tns1.reg.el))) {
                 stop("`tns1` doesn't contain any useful information.")
-            }
-            else {
+            } else {
                 tmp <- tns2
                 tns2 <- tns1
                 tns1 <- tmp
@@ -712,8 +710,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
                 }    
             }
             
-        }
-        else {
+        } else {
             if (!(regs[2] %in% tns2.reg.el) & !(regs[2] %in% names(tns2.reg.el))) {
                 stop("`tns2` doesn't contain any useful information.") 
             }
@@ -771,10 +768,10 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
                       nSections = nSections, excludeMid = excludeMid)
     dES2$regstatus <- dES2$regstatus[rownames(dES1$regstatus),]
     samples <- rownames(dES1$regstatus)[dES1$regstatus[,regs[1]] == dES2$regstatus[,regs[2]]]
-    pal.cols <- brewer.pal((nSections*4), pal)[c(2:(nSections+1), 
-                                                 (nSections+3):(nSections*4))]
+    n <- nSections*2+1
+    pal.cols <- brewer.pal(n, pal)
     if (!excludeMid)
-        pal.cols <- c(pal.cols[1:nSections], "grey80", pal.cols[nSections+2:length(pal.cols)])
+        pal.cols[nSections+1] <- "grey80"
     #-- if samples are disagreeing: use opposites for KM
     samples_cor <- cor(dES1$regstatus[,regs[1]], dES2$regstatus[,regs[2]])
     
@@ -783,9 +780,12 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
         nStrat <- nSections*2+1
         up <- 1:nStrat
         down <- nStrat:1
-        up <- up[-(nSections+1)]
-        down <- down[-(nSections+1)]
-        
+        if (excludeMid) {
+            up <- up[-(nSections+1)]
+            down <- down[-(nSections+1)]
+        }
+
+
         for (i in 1:length(up)) {
             current_samps <- rownames(dES1$regstatus)[dES1$regstatus[,regs[1]] == up[i]]
             current_samps[current_samps %in% rownames(dES2$regstatus)[dES2$regstatus[,regs[2]] == down[i]]]
@@ -848,8 +848,28 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     dev.off()
     
     
-    #----- Cox plot
+    #---- Cox model   
+    survData <- tnsGet(tns1, "survivalData")
+    keycovar <- tnsGet(tns1, "keycovar")
+    dES1 <- tnsGet(tns1, "EScores")$dif
+    dES2 <- tnsGet(tns2, "EScores")$dif
     
+    if(is.null(keycovar)) {
+        cox_data <- survData[,c("time","event")]
+        cox_data <- cbind(cox_data, dES1[rownames(cox_data), regs[1]], 
+                          dES2[rownames(cox_data), regs[2]])
+        formula <- paste0("Surv(time, event) ~ ", regs[1], "*", regs[2])
+    } else {
+        cox_data <- survData[,c("time","event", keycovar)]
+        cox_data <- cbind(cox_data, dES1[rownames(cox_data), regs[1]], 
+                          dES2[rownames(cox_data), regs[2]])
+        covar_form <- paste(keycovar, collapse = " + ")
+        formula <- paste0("Surv(time, event) ~ ", regs[1], "*", regs[2], " + ", covar_form)
+    }
+    colnames(cox_data)[(ncol(cox_data)-1):ncol(cox_data)] <- regs
+    cox_model <- coxph(as.formula(formula), data = cox_data)
+    
+    #----- Cox plot
     fname <- paste(path, "/",  "5.coxplot_", dual, ".pdf", sep = "")
     pdf(file = fname, width = 4.25, height = 2.5)
     dualCoxPlot(dual, dualCoxTable)
@@ -865,6 +885,6 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     msg <- paste0("NOTE: 'PDF' files should be available at the working directory ", "(see '",path,"' folder). ", 
                   "More information on the interpretation of the plot can be found in Figure 5 in vignette('RTNsurvival')")
     message(msg)
-    
+    invisible(cox_model)
 })
 

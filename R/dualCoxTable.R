@@ -32,9 +32,8 @@
 #' library(RTNduals)
 #' tni <- tnsGet(stns, "TNI")
 #' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
-#' mbr <- mbrAssociation(mbr, prob = 0.75)
-#' mbr <- mbrDuals(mbr)
-#' results <- mbrGet(mbr, what="dualsInformation")
+#' mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
+#' results <- mbrGet(mbr, what="dualsCorrelation")
 #' 
 #' # create dual Cox regression
 #' dualCox <- dualCoxTable(mbr, stns, verbose = FALSE)
@@ -42,7 +41,7 @@
 #' @seealso \code{\link[RTNduals:tni2mbrPreprocess]{tni2mbrPreprocess}} for all 
 #' plot parameters
 #' @return A matrix containing the Cox regression results for all given duals
-#' @importFrom RTNduals tni2mbrPreprocess mbrAssociation mbrDuals mbrGet
+#' @importFrom RTNduals tni2mbrPreprocess mbrAssociation mbrPriorEvidenceTable mbrGet
 #' @export
 
 dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
@@ -72,8 +71,7 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
                  present in `regulatoryElements` of tns1.")
         }
         tns2 <- tns1
-    }
-    else {
+    } else {
         regs1 <- unlist(strsplit(duals, "~"))[c(TRUE, FALSE)]
         regs2 <- unlist(strsplit(duals, "~"))[c(FALSE, TRUE)]
         tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
@@ -91,8 +89,7 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
                 }    
             }
             
-        }
-        else {
+        } else {
             if (!all(regs2 %in% tns2.reg.el) & !all(regs2 %in% names(tns2.reg.el))) {
                 stop("`tns2` doesn't contain any useful information.") 
             }
@@ -113,7 +110,6 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
     mbr.regs2 <- unlist(strsplit(duals, "~"))[seq(2, length(duals)*2, 2)]
     
     if (!all(mbr.regs1 %in% tns.regs1) | !all(mbr.regs2 %in% tns.regs2)) {
-        
         idx1 <- which(mbr.regs1 %in% tns.regs1)
         idx2 <- which(mbr.regs2 %in% tns.regs2)
         duals <- duals[intersect(idx1, idx2)]
@@ -125,15 +121,12 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
     
     #-- checks
     dif1 <- EScores1$dif
-    if (excludeMid) {
-        dif1[EScores1$regstatus == EScores1$mid] <- NA
-    }
-    
     dif2 <- EScores2$dif
     if (excludeMid) {
+        dif1[EScores1$regstatus == EScores1$mid] <- NA
         dif2[EScores2$regstatus == EScores2$mid] <- NA
     }
-    
+
     dif1 <- dif1[rownames(dif2),]
     
     #-- correct names

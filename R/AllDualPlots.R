@@ -479,7 +479,6 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
     #-- re-arrange samples
     dES_reg2 <- dES_reg2[names(dES_reg1)]
     
-    
     #-- assign colors to points
     samples <- names(dES_reg1)
     if (nSections > 2)
@@ -488,7 +487,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
         cols <- RColorBrewer::brewer.pal(nSections*4, pal)
     
     if (mode == "agreement"){
-        
+        cols <- cols
         bgcol <- sapply(samples, function(sample) {
             #-- get sample stratums
             strat1 <- dES1$regstatus[sample,regs[1]]
@@ -520,6 +519,7 @@ rankScatter <- function(tns1, tns2, dual, dES1, dES2, pal = "BrBG", nSections,
         })
     }
     else if (mode == "disagreement") {
+        cols <- cols
         bgcol <- sapply(samples, function(sample) {
             #-- get sample stratums
             strat1 <- dES1$regstatus[sample,regs[1]]
