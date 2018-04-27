@@ -573,9 +573,7 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' @param mbr an \linkS4class{MBR} object computed from
 #' the same \linkS4class{TNI} objects that were used to make the
 #' \linkS4class{TNS} objects.
-#' @param tns1 a `TNS` object with regulons used to compute the duals.
-#' @param tns2 another `TNS`  object computed with the other regulons used to 
-#' compute the duals. It's optional if all duals are from the same 'TNI' object.
+#' @param tns a `TNS` object with regulons used to compute the duals.
 #' @param dual a character string with the name of a dual
 #' @param attribs a numeric vector. Contains the columns of the survival 
 #' data.frame which will be plotted as sample status in first and second plots.
@@ -614,7 +612,7 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' # create MBR-object using TF-TF duals
 #' library(RTNduals)
 #' tni <- tnsGet(stns, "TNI")
-#' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
+#' mbr <- tni2mbrPreprocess(tni, verbose = FALSE)
 #' mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 #' duals <- mbrGet(mbr, what="dualRegulons")
 #' 
@@ -640,7 +638,7 @@ setMethod("tnsGet", "TNS", function(object, what)
 #' @aliases dualSurvivalPanel
 #' @export
 #' 
-setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual, 
+setMethod("dualSurvivalPanel", "MBR", function(mbr, tns, dual, 
                                                attribs = NULL, endpoint = 60,
                    path = NULL,  nSections = 2, 
                    pal = "BrBG", excludeMid = FALSE, sectionsLegend = NULL,
@@ -648,11 +646,11 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
 {
     
     .tns.checks(mbr, type = "MBR")
-    .tns.checks(tns1, type = "status")
-    if (!is.null(tns2))
-        .tns.checks(tns2, type = "status")
+    .tns.checks(tns, type = "status")
+    # if (!is.null(tns2))
+    #     .tns.checks(tns2, type = "status")
     .tns.checks(dual, mbr, type = "Duals")
-    .tns.checks(attribs, tnsGet(tns1, "survivalData"), type = "attribs")
+    .tns.checks(attribs, tnsGet(tns, "survivalData"), type = "attribs")
     .tns.checks(endpoint, type = "EndPoint")
     .tns.checks(path, type = "Path2")
     .tns.checks(pal, type = "CBpal")
@@ -687,70 +685,70 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     }
     
     #-- data wrangling
-    tns1.reg.el <- tnsGet(tns1, "regulatoryElements")
-    if (is.null(tns2)) {
-        all.regs <- unlist(strsplit(dual, "~"))
-        if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
-        {
-            stop("If tns2 is not given, all regulons used to compute duals must be present in `regulatoryElements` of tns1.")
-        }
-        tns2 <- tns1
-    } else {
-        tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
-        if (!(regs[1] %in% tns1.reg.el) & !(regs[1] %in% names(tns1.reg.el))){
-            if(!(regs[2] %in% tns1.reg.el) & !(regs[2] %in% names(tns1.reg.el))) {
-                stop("`tns1` doesn't contain any useful information.")
-            } else {
-                tmp <- tns2
-                tns2 <- tns1
-                tns1 <- tmp
-                rm(tmp)
-                if (!(regs[1] %in% tns2.reg.el) & !(regs[1] %in% names(tns2.reg.el))) {
-                    stop("`tns2` doesn't contain any useful information.")
-                }    
-            }
-            
-        } else {
-            if (!(regs[2] %in% tns2.reg.el) & !(regs[2] %in% names(tns2.reg.el))) {
-                stop("`tns2` doesn't contain any useful information.") 
-            }
-        }
-    }
+    tns.reg.el <- tnsGet(tns, "regulatoryElements")
+    # if (is.null(tns2)) {
+    #     all.regs <- unlist(strsplit(dual, "~"))
+    #     if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
+    #     {
+    #         stop("If tns2 is not given, all regulons used to compute duals must be present in `regulatoryElements` of tns1.")
+    #     }
+    #     tns2 <- tns1
+    # } else {
+    #     tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
+    #     if (!(regs[1] %in% tns1.reg.el) & !(regs[1] %in% names(tns1.reg.el))){
+    #         if(!(regs[2] %in% tns1.reg.el) & !(regs[2] %in% names(tns1.reg.el))) {
+    #             stop("`tns1` doesn't contain any useful information.")
+    #         } else {
+    #             tmp <- tns2
+    #             tns2 <- tns1
+    #             tns1 <- tmp
+    #             rm(tmp)
+    #             if (!(regs[1] %in% tns2.reg.el) & !(regs[1] %in% names(tns2.reg.el))) {
+    #                 stop("`tns2` doesn't contain any useful information.")
+    #             }    
+    #         }
+    #         
+    #     } else {
+    #         if (!(regs[2] %in% tns2.reg.el) & !(regs[2] %in% names(tns2.reg.el))) {
+    #             stop("`tns2` doesn't contain any useful information.") 
+    #         }
+    #     }
+    # }
     #-- check if tns are for same gexp
-    if(!identical(tni.get(tnsGet(tns1, "TNI"), "gexp"), 
-              tni.get(tnsGet(tns2, "TNI"), "gexp"))) {
-        stop("The expression matrix (gexp) used to compute the TNIs must be the same.")
-    }
+    # if(!identical(tni.get(tnsGet(tns1, "TNI"), "gexp"), 
+    #           tni.get(tnsGet(tns2, "TNI"), "gexp"))) {
+    #     stop("The expression matrix (gexp) used to compute the TNIs must be the same.")
+    # }
     
     #--- Coxtable
-    dualCoxTable <- dualCoxTable(mbr, tns1, tns2, duals = dual, 
+    dualCoxTable <- dualCoxTable(mbr, tns, duals = dual, 
                                  excludeMid = excludeMid, verbose = FALSE)
     
     #----- dES plots
     fname <- paste(path, "/", "1.dESregPlot_", regs[1], ".pdf", sep = "")
     pdf(file = fname, width = 3.897, height = 4.1335)
-    dESregPlot(tns1, regs = regs[1], attribs = attribs, 
+    dESregPlot(tns, regs = regs[1], attribs = attribs, 
                panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections,
                attribs.cex = attribs.cex)
     dev.off()
     
     fname <- paste(path, "/", ".1.dESregPlot_", regs[1], ".png", sep = "")
     png(filename = fname, width = 3.897*png.res, height = 4.1335*png.res, res = png.res)
-    dESregPlot(tns1, regs = regs[1], attribs = attribs, 
+    dESregPlot(tns, regs = regs[1], attribs = attribs, 
                panelWidths = panelWidths, flipGraph = TRUE, nSections = nSections,
                xname = "a", attribs.cex = attribs.cex)
     dev.off()
     
     fname <- paste(path, "/", "2.dESregPlot_", regs[2], ".pdf", sep = "")
     pdf(file = fname, width = 3.897, height = 4.1335)
-    dESregPlot(tns2, regs = regs[2], attribs = attribs, 
+    dESregPlot(tns, regs = regs[2], attribs = attribs, 
                panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections,
                attribs.cex = attribs.cex)
     dev.off()
     
     fname <- paste(path, "/", ".2.dESregPlot_", regs[2], ".png", sep = "")
     png(filename = fname, width = 3.897*png.res, height = 4.1335*png.res, res = png.res)
-    dESregPlot(tns2, regs = regs[2], attribs = attribs, 
+    dESregPlot(tns, regs = regs[2], attribs = attribs, 
                panelWidths = panelWidths, flipGraph = FALSE, nSections = nSections,
                xname = "b", attribs.cex = attribs.cex)
     dev.off()
@@ -760,10 +758,10 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     pdf(file = fname, width = 3.897, height = 6.3)
     layout(matrix(c(1,2,3,3), ncol = 2, byrow = TRUE), widths = c(4,3.3), heights = c(3,5))
     par(mar = c(1,1,1,1))
-    dES1 <- KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+    dES1 <- KMregPlot(tns, reg = regs[1], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
                       pval.pos = "bottomright", ylab.cex = 1.2, xlab.cex = 1.2, nSections = nSections,
                       excludeMid = excludeMid)
-    dES2 <- KMregPlot(tns2, reg = regs[2], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+    dES2 <- KMregPlot(tns, reg = regs[2], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
                       pval.pos = "bottomright", y.axis = TRUE, ylab.cex = 1.2, xlab.cex = 1.2, ylab = "", 
                       nSections = nSections, excludeMid = excludeMid)
     dES2$regstatus <- dES2$regstatus[rownames(dES1$regstatus),]
@@ -792,7 +790,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
             samples <- c(samples, current_samps)
         }
         
-        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+        KMregPlot(tns, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
                   pval.pos = "bottomright", title = "Interaction", samples = samples, KMlegend.cex = 0.7, 
                   ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections,
                   excludeMid = excludeMid, pal = pal.cols)
@@ -800,7 +798,7 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
         
     }
     else {
-        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+        KMregPlot(tns, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
                   title = "Interaction", ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections, pal = pal.cols,
                   excludeMid = excludeMid, pval.pos = "bottomright")
         mode <- "agreement"
@@ -811,21 +809,21 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     png(filename = fname, width = 3.897*png.res, height = 6.3*png.res, res = png.res)
     layout(matrix(c(1,2,3,3), ncol = 2, byrow = TRUE), widths = c(4,3.3), heights = c(3,5))
     par(mar = c(1,1,1,1))
-    KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+    KMregPlot(tns, reg = regs[1], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
               pval.pos = "bottomright", ylab.cex = 1.2, xlab.cex = 1.2, nSections = nSections,
               excludeMid = excludeMid, xname = "c")
-    KMregPlot(tns2, reg = regs[2], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
+    KMregPlot(tns, reg = regs[2], endpoint = endpoint, xlab = "", show.KMlegend = FALSE, pval.cex = 0.9,
               pval.pos = "bottomright", y.axis = TRUE, ylab.cex = 1.2, xlab.cex = 1.2, ylab = "", 
               nSections = nSections, excludeMid = excludeMid)
     
     if (mode == "disagreement") {
-        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+        KMregPlot(tns, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
                   pval.pos = "bottomright", title = "Interaction", samples = samples, KMlegend.cex = 0.7, 
                   ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections,
                   excludeMid = excludeMid, pal = pal.cols)
     }
     else {
-        KMregPlot(tns1, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
+        KMregPlot(tns, reg = regs[1], endpoint = endpoint, xlab = "Months", show.KMlegend = TRUE, pval.cex = 1,
                   pval.pos = "bottomright", title = "Interaction", samples = samples, KMlegend.cex = 0.8, 
                   ylab.cex = 1.2, xlab.cex = 1.2, title.cex = 1.2, nSections = nSections, pal = pal.cols,
                   excludeMid = excludeMid)
@@ -837,22 +835,22 @@ setMethod("dualSurvivalPanel", "MBR", function(mbr, tns1, tns2 = NULL, dual,
     
     fname <- paste(path, "/",  "3.rankScatter_", dual, ".pdf", sep = "")
     pdf(fname, width = 3.3, height = 3.5)
-    rankScatter(tns1, tns2, dual, dES1, dES2, nSections = nSections, mode = mode,
+    rankScatter(tns, tns, dual, dES1, dES2, nSections = nSections, mode = mode,
                 pal = pal)
     dev.off()
     
     fname <- paste(path, "/",  ".3.rankScatter_", dual, ".png", sep = "")
     png(fname, width = 3.3*png.res, height = 3.5*png.res, res = png.res)
-    rankScatter(tns1, tns2, dual, dES1, dES2, nSections = nSections, mode = mode,
+    rankScatter(tns, tns, dual, dES1, dES2, nSections = nSections, mode = mode,
                 pal = pal)
     dev.off()
     
     
     #---- Cox model   
-    survData <- tnsGet(tns1, "survivalData")
-    keycovar <- tnsGet(tns1, "keycovar")
-    dES1 <- tnsGet(tns1, "EScores")$dif
-    dES2 <- tnsGet(tns2, "EScores")$dif
+    survData <- tnsGet(tns, "survivalData")
+    keycovar <- tnsGet(tns, "keycovar")
+    dES1 <- tnsGet(tns, "EScores")$dif
+    dES2 <- tnsGet(tns, "EScores")$dif
     
     if(is.null(keycovar)) {
         cox_data <- survData[,c("time","event")]

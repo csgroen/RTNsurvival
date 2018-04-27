@@ -6,20 +6,17 @@
 \alias{dualSurvivalPanel}
 \title{Panel plot of regulons in a inferred dual}
 \usage{
-\S4method{dualSurvivalPanel}{MBR}(mbr, tns1, tns2 = NULL, dual,
-  attribs = NULL, endpoint = 60, path = NULL, nSections = 2,
-  pal = "BrBG", excludeMid = FALSE, sectionsLegend = NULL,
-  panelWidths = c(2, 3), png.res = 150, attribs.cex = 1)
+\S4method{dualSurvivalPanel}{MBR}(mbr, tns, dual, attribs = NULL,
+  endpoint = 60, path = NULL, nSections = 2, pal = "BrBG",
+  excludeMid = FALSE, sectionsLegend = NULL, panelWidths = c(2, 3),
+  png.res = 150, attribs.cex = 1)
 }
 \arguments{
 \item{mbr}{an \linkS4class{MBR} object computed from
 the same \linkS4class{TNI} objects that were used to make the
 \linkS4class{TNS} objects.}
 
-\item{tns1}{a `TNS` object with regulons used to compute the duals.}
-
-\item{tns2}{another `TNS`  object computed with the other regulons used to 
-compute the duals. It's optional if all duals are from the same 'TNI' object.}
+\item{tns}{a `TNS` object with regulons used to compute the duals.}
 
 \item{dual}{a character string with the name of a dual}
 
@@ -85,7 +82,7 @@ stns <- tnsGSEA2(stns, verbose=FALSE)
 # create MBR-object using TF-TF duals
 library(RTNduals)
 tni <- tnsGet(stns, "TNI")
-mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
+mbr <- tni2mbrPreprocess(tni, verbose = FALSE)
 mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 duals <- mbrGet(mbr, what="dualRegulons")
 

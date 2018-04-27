@@ -125,7 +125,7 @@ The workflow of the **RTNduals** can be used to infer dual TF-TF regulons, using
 
 ```{r}
 library(RTNduals)
-smbr <- tni2mbrPreprocess(stni, stni, verbose = FALSE)
+smbr <- tni2mbrPreprocess(stni, verbose = FALSE)
 smbr <- mbrAssociation(smbr, pValueCutoff = 0.05, verbose = FALSE)
 mbrGet(smbr, "dualsCorrelation")
 ```

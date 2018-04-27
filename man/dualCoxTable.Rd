@@ -4,18 +4,14 @@
 \alias{dualCoxTable}
 \title{Cox regression analysis for dual regulons}
 \usage{
-dualCoxTable(mbr, tns1, tns2 = NULL, duals = NULL, verbose = TRUE,
-  excludeMid = FALSE)
+dualCoxTable(mbr, tns, duals = NULL, verbose = TRUE, excludeMid = FALSE)
 }
 \arguments{
 \item{mbr}{an \linkS4class{MBR} object computed from
 the same \linkS4class{TNI} objects that were used to make the
 \linkS4class{TNS} objects.}
 
-\item{tns1}{a 'TNS' object with regulons used to compute the duals.}
-
-\item{tns2}{another 'TNS' object computed with the other regulons used to 
-compute the duals. It's optional if all duals are from the same 'TNI' object.}
+\item{tns}{a 'TNS' object with regulons used to compute the duals.}
 
 \item{duals}{an optional vector containing duals to create the table. If NULL,
 the regression is performed for all duals.}
@@ -49,7 +45,7 @@ stns <- tnsGSEA2(stns, verbose=FALSE)
 # create MBR-object using TF-TF duals
 library(RTNduals)
 tni <- tnsGet(stns, "TNI")
-mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
+mbr <- tni2mbrPreprocess(tni, verbose = FALSE)
 mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 results <- mbrGet(mbr, what="dualsCorrelation")
 

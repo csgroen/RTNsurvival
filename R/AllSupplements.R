@@ -1,4 +1,3 @@
-
 #' Plot 2-tailed GSEA for a sample from a TNS
 #'
 #' Makes a 2-tailed GSEA plot for a certain phenotype (sample)

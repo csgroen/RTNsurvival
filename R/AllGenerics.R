@@ -20,7 +20,7 @@ setGeneric("tnsGet", function(object, what) standardGeneric("tnsGet"),
            package = "RTNsurvival")
 
 setGeneric("dualSurvivalPanel", 
-           function(mbr, tns1, tns2 = NULL, dual, attribs = NULL, endpoint = 60,path = NULL,  
+           function(mbr, tns, dual, attribs = NULL, endpoint = 60,path = NULL,  
                     nSections = 2, pal = "BrBG", excludeMid = FALSE, 
                     sectionsLegend = NULL, panelWidths = c(2,3), 
                     png.res = 150, attribs.cex = 1) standardGeneric("dualSurvivalPanel"), 

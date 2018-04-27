@@ -6,9 +6,7 @@
 #' @param mbr an \linkS4class{MBR} object computed from
 #' the same \linkS4class{TNI} objects that were used to make the
 #' \linkS4class{TNS} objects.
-#' @param tns1 a 'TNS' object with regulons used to compute the duals.
-#' @param tns2 another 'TNS' object computed with the other regulons used to 
-#' compute the duals. It's optional if all duals are from the same 'TNI' object.
+#' @param tns a 'TNS' object with regulons used to compute the duals.
 #' @param duals an optional vector containing duals to create the table. If NULL,
 #' the regression is performed for all duals.
 #' @param verbose a logical value. If TRUE, prints status of function while 
@@ -31,7 +29,7 @@
 #' # create MBR-object using TF-TF duals
 #' library(RTNduals)
 #' tni <- tnsGet(stns, "TNI")
-#' mbr <- tni2mbrPreprocess(tni, tni, verbose = FALSE)
+#' mbr <- tni2mbrPreprocess(tni, verbose = FALSE)
 #' mbr <- mbrAssociation(mbr, pValueCutoff = 0.05)
 #' results <- mbrGet(mbr, what="dualsCorrelation")
 #' 
@@ -44,14 +42,14 @@
 #' @importFrom RTNduals tni2mbrPreprocess mbrAssociation mbrPriorEvidenceTable mbrGet
 #' @export
 
-dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
+dualCoxTable <- function(mbr, tns, duals = NULL,
                          verbose = TRUE, excludeMid = FALSE) {
     
     #-- checks
     .tns.checks(mbr, type =  "MBR")
-    .tns.checks(tns1, type =  "status")
-    if (!is.null(tns2)) 
-        .tns.checks(tns2, type =  "status")
+    .tns.checks(tns, type =  "status")
+    # if (!is.null(tns2)) 
+    #     .tns.checks(tns2, type =  "status")
     .tns.checks(duals, mbr, type = "Duals")
     .tns.checks(verbose, type = "Verbose")
     .tns.checks(excludeMid, type = "ExcludeMid")
@@ -61,57 +59,55 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
         duals <- mbrGet(mbr, what = "dualRegulons")
     
     
-    tns1.reg.el <- tnsGet(tns1, "regulatoryElements")
-    #-- data wrangling
-    if (is.null(tns2)) {
-        all.regs <- unique(unlist(strsplit(duals, "~")))
-        if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
-        {
-            stop("If tns2 is not given, all regulons used to compute duals must be
-                 present in `regulatoryElements` of tns1.")
-        }
-        tns2 <- tns1
-    } else {
-        regs1 <- unlist(strsplit(duals, "~"))[c(TRUE, FALSE)]
-        regs2 <- unlist(strsplit(duals, "~"))[c(FALSE, TRUE)]
-        tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
-        if (!all(regs1 %in% tns1.reg.el) & !all(regs1 %in% names(tns1.reg.el))){
-            if(!all(regs2 %in% tns1.reg.el) & !all(regs2 %in% names(tns1.reg.el))) {
-                stop("`tns1` doesn't contain any useful information.")
-            }
-            else {
-                tmp <- tns2
-                tns2 <- tns1
-                tns1 <- tmp
-                rm(tmp)
-                if (!all(regs1 %in% tns2.reg.el) & !all(regs1 %in% names(tns2.reg.el))) {
-                    stop("`tns2` doesn't contain any useful information.")
-                }    
-            }
-            
-        } else {
-            if (!all(regs2 %in% tns2.reg.el) & !all(regs2 %in% names(tns2.reg.el))) {
-                stop("`tns2` doesn't contain any useful information.") 
-            }
-        }
-    }
+    tns.reg.el <- tnsGet(tns, "regulatoryElements")
+    # #-- data wrangling
+    # if (is.null(tns2)) {
+    #     all.regs <- unique(unlist(strsplit(duals, "~")))
+    #     if(!all(all.regs %in% tns1.reg.el) & !all(all.regs %in% names(tns1.reg.el)))
+    #     {
+    #         stop("If tns2 is not given, all regulons used to compute duals must be
+    #              present in `regulatoryElements` of tns1.")
+    #     }
+    #     tns2 <- tns1
+    # } else {
+    #     regs1 <- unlist(strsplit(duals, "~"))[c(TRUE, FALSE)]
+    #     regs2 <- unlist(strsplit(duals, "~"))[c(FALSE, TRUE)]
+    #     tns2.reg.el <- tnsGet(tns2, "regulatoryElements")
+    #     if (!all(regs1 %in% tns1.reg.el) & !all(regs1 %in% names(tns1.reg.el))){
+    #         if(!all(regs2 %in% tns1.reg.el) & !all(regs2 %in% names(tns1.reg.el))) {
+    #             stop("`tns1` doesn't contain any useful information.")
+    #         }
+    #         else {
+    #             tmp <- tns2
+    #             tns2 <- tns1
+    #             tns1 <- tmp
+    #             rm(tmp)
+    #             if (!all(regs1 %in% tns2.reg.el) & !all(regs1 %in% names(tns2.reg.el))) {
+    #                 stop("`tns2` doesn't contain any useful information.")
+    #             }    
+    #         }
+    #         
+    #     } else {
+    #         if (!all(regs2 %in% tns2.reg.el) & !all(regs2 %in% names(tns2.reg.el))) {
+    #             stop("`tns2` doesn't contain any useful information.") 
+    #         }
+    #     }
+    # }
     
     #-- gets
-    EScores1 <- tnsGet(tns1, what = "EScores")
-    EScores2 <- tnsGet(tns2, what = "EScores")
-    survData <- tnsGet(tns1, what = "survivalData")
-    keycovar <- tnsGet(tns1, what = "keycovar")
+    EScores <- tnsGet(tns, what = "EScores")
+    survData <- tnsGet(tns, what = "survivalData")
+    keycovar <- tnsGet(tns, what = "keycovar")
     
     #-- mbr vs tns checks
-    tns.regs1 <- colnames(EScores1$dif)
-    tns.regs2 <- colnames(EScores2$dif)
+    tns.regs <- colnames(EScores$dif)
     
     mbr.regs1 <- unlist(strsplit(duals, "~"))[seq(1, length(duals)*2, 2)]
     mbr.regs2 <- unlist(strsplit(duals, "~"))[seq(2, length(duals)*2, 2)]
     
-    if (!all(mbr.regs1 %in% tns.regs1) | !all(mbr.regs2 %in% tns.regs2)) {
-        idx1 <- which(mbr.regs1 %in% tns.regs1)
-        idx2 <- which(mbr.regs2 %in% tns.regs2)
+    if (!all(mbr.regs1 %in% tns.regs) | !all(mbr.regs2 %in% tns.regs)) {
+        idx1 <- which(mbr.regs1 %in% tns.regs)
+        idx2 <- which(mbr.regs2 %in% tns.regs)
         duals <- duals[intersect(idx1, idx2)]
         
         warning(paste("Not all regulons in the duals have had enrichment scores computed. 
@@ -120,28 +116,23 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
     }
     
     #-- checks
-    dif1 <- EScores1$dif
-    dif2 <- EScores2$dif
+    dif <- EScores$dif
     if (excludeMid) {
-        dif1[EScores1$regstatus == EScores1$mid] <- NA
-        dif2[EScores2$regstatus == EScores2$mid] <- NA
+        dif1[EScores$regstatus == EScores$mid] <- NA
     }
-
-    dif1 <- dif1[rownames(dif2),]
     
     #-- correct names
-    colnames(dif1) <- .namesCorrect(colnames(dif1))
-    colnames(dif2) <- .namesCorrect(colnames(dif2))
+    colnames(dif) <- .namesCorrect(colnames(dif))
     
     #--- get cox formula
-    if (is.null(tns1@keycovar)) {
+    if (is.null(tns@keycovar)) {
         fm1 <- "Surv(time, event) ~ "
     } else {
         fm1 <- paste("Surv(time, event) ~ ", paste(keycovar, collapse = "+"), sep = "")
     }
     
     #-- make summary of data
-    summary <- cbind(survData, dif1, dif2)
+    summary <- cbind(survData, dif)
     
     if (verbose) {
         cat("Calculating cox regression for duals...\n")
@@ -151,11 +142,11 @@ dualCoxTable <- function(mbr, tns1, tns2 = NULL, duals = NULL,
     resall <- sapply(duals, function(dual) {
         regs <- unlist(strsplit(dual, "~"))
         regs <- .namesCorrect(regs)
-        nas1 <- is.na(dif1[, regs[1]])
-        nas2 <- is.na(dif2[, regs[2]])
+        nas1 <- is.na(dif[, regs[1]])
+        nas2 <- is.na(dif[, regs[2]])
         if(verbose)
             setTxtProgressBar(pb, which(duals == dual))
-        if (sum(nas1) > nrow(dif1)/2 | sum(nas2) > nrow(dif2)/2) {
+        if (sum(nas1) > nrow(dif)/2 | sum(nas2) > nrow(dif)/2) {
             hz <- c(1, 1, 0.99, 1.01,
                     1, 1, 0.99, 1.01,
                     1, 1, 0.99, 1.01)
