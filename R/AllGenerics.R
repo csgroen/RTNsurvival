@@ -1,27 +1,70 @@
 
-setGeneric("tnsPreprocess", function(tni, survivalData, keycovar = NULL, time = 1, event = 2, 
-    samples = NULL) standardGeneric("tnsPreprocess"), package = "RTNsurvival")
+setGeneric("tni2tnsPreprocess", 
+           function(tni, survivalData = NULL, regulatoryElements = NULL, 
+                    time = 1, event = 2, endpoint = NULL, pAdjustMethod = "BH", 
+                    keycovar = NULL, samples = NULL, excludeMid = FALSE) 
+             standardGeneric("tni2tnsPreprocess"), package = "RTNsurvival")
 
-setGeneric("tnsGSEA2", function(tns, ...) standardGeneric("tnsGSEA2"), package = "RTNsurvival")
+setGeneric("tnsGSEA2", 
+           function(tns, ...) 
+             standardGeneric("tnsGSEA2"), package = "RTNsurvival")
 
-setGeneric("tnsKM", function(tns, regs = NULL, attribs = NULL, nSections = 2, endpoint = 60, 
-    fname = "survplot", fpath = ".", ylab = "Survival probability", xlab = "Months", 
-    pal = "redblue", excludeMid = FALSE, flipcols = FALSE, plotpdf = TRUE, plotbatch = FALSE, 
-    width = 6.3, height = 3.6, panelWidths = c(3, 2, 4), dES.ylab = "Samples", show.KMlegend = TRUE, 
-    KMlegend.pos = "bottomleft", KMlegend.cex = 1, show.pval = TRUE, pval.cex = 1, 
-    pval.pos = "topright") standardGeneric("tnsKM"), package = "RTNsurvival")
+setGeneric("tnsKM", 
+           function(tns, regs = NULL, nSections = 1, verbose = TRUE) 
+             standardGeneric("tnsKM"), package = "RTNsurvival")
 
-setGeneric("tnsCox", function(tns, regs = NULL, endpoint = 60, fname = "coxplot", 
-    fpath = ".", ylab = "Regulons and key covariates", xlab = "Hazard Ratio (95% CI)", 
-    qqkeycovar = FALSE, excludeMid = FALSE, width = 5, height = 5, xlim = c(0.2, 
-        10), sortregs = TRUE, plotpdf = TRUE) standardGeneric("tnsCox"), package = "RTNsurvival")
+setGeneric("tnsPlotKM", 
+           function(tns, regs = NULL, attribs = NULL, fname = "survplot", 
+                    fpath = ".", xlab = "Months", ylab = "Survival probability", 
+                    colorPalette = "bluered", plotpdf = FALSE, plotbatch = FALSE, 
+                    width = 6.3, height = 3.6, panelWidths = c(3, 2, 4)) 
+             standardGeneric("tnsPlotKM"), package = "RTNsurvival")
 
-setGeneric("tnsGet", function(object, what) standardGeneric("tnsGet"), 
+setGeneric("tnsCox", 
+           function(tns, regs = NULL, qqkeycovar = FALSE, verbose = TRUE) 
+             standardGeneric("tnsCox"), package = "RTNsurvival")
+
+setGeneric("tnsPlotCox", 
+           function(tns, regs = NULL, fname = "coxplot", 
+                    fpath = ".", ylab = "Regulons and other covariates", 
+                    xlab = "Hazard Ratio (95% CI)", width = 5, 
+                    height = 5, xlim = c(0.3, 3), 
+                    sortregs = TRUE, plotpdf = FALSE) 
+             standardGeneric("tnsPlotCox"), package = "RTNsurvival")
+
+setGeneric("tnsGet", 
+           function(tns, what) standardGeneric("tnsGet"), 
            package = "RTNsurvival")
 
-setGeneric("dualSurvivalPanel", 
-           function(mbr, tns, dual, attribs = NULL, endpoint = 60,path = NULL,  
-                    nSections = 2, pal = "BrBG", excludeMid = FALSE, 
-                    sectionsLegend = NULL, panelWidths = c(2,3), 
-                    png.res = 150, attribs.cex = 1) standardGeneric("dualSurvivalPanel"), 
-           package = "RTNsurvival")
+setGeneric("tnsInteraction",
+           function(tns, ..., verbose = TRUE)
+             standardGeneric("tnsInteraction"), package = "RTNsurvival")
+
+setGeneric("tnsKmInteraction",
+           function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE)
+             standardGeneric("tnsKmInteraction"), package = "RTNsurvival")
+
+setGeneric("tnsPlotKmInteraction", 
+           function(tns, dualreg = NULL, fname = "kmInteraction", 
+                    fpath = ".", xlab = "Months", 
+                    ylab = "Survival probability", colorPalette = "bluered", 
+                    width = 4, height = 4, plotpdf = FALSE) 
+             standardGeneric("tnsPlotKmInteraction"), package = "RTNsurvival")
+
+setGeneric("tnsCoxInteraction",
+           function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE) 
+             standardGeneric("tnsCoxInteraction"), package = "RTNsurvival")
+
+setGeneric("tnsPlotCoxInteraction",
+           function(tns, dualreg, xlim = NULL, ylim = NULL, hlim = NULL, 
+                    hcols = c("#008080ff","#d45500ff"), showdata = TRUE, 
+                    colorPalette = "bluered", fname = "coxInteraction", 
+                    fpath = ".", width = 5, height = 4, plotype = "3D", plotpdf = FALSE) 
+             standardGeneric("tnsPlotCoxInteraction"), package = "RTNsurvival")
+
+setGeneric("tnsPlotGSEA2",
+           function(tns, aSample, regs = NULL, refsamp = NULL, checklog = FALSE, 
+                    ntop = NULL, pValueCutoff = 0.05, pAdjustMethod = "BH", 
+                    verbose = TRUE, plotpdf = FALSE, ...) 
+             standardGeneric("tnsPlotGSEA2"), package = "RTNsurvival")
+

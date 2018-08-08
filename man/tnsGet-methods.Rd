@@ -6,20 +6,22 @@
 \alias{tnsGet}
 \title{Get information from slots in a TNS object}
 \usage{
-\S4method{tnsGet}{TNS}(object, what)
+\S4method{tnsGet}{TNS}(tns, what)
 }
 \arguments{
-\item{object}{a TNS object}
+\item{tns}{A \linkS4class{TNS} object.}
 
-\item{what}{a character vector specifying what should be retrieved from the
-object. Options: 'survivalData', 'EScores', 'TNI', 'keycovar'}
+\item{what}{A string specifying what should be retrieved from the object.
+Options: 'status','survivalData', 'regulonActivity', 'TNI', 'para', 'kmTable', 'kmFit', 
+'coxTable', 'coxFit', 'kmInteractionTable', 'kmInteractionFit', 
+'coxInteractionTable', 'coxInteractionFit', and 'regulatoryElements'.}
 }
 \value{
-A plot containing the 2-tailed GSEA analysis for a phenotype.
+Content from slots in the \linkS4class{TNS} object.
 }
 \description{
-Get information from individual slots in a TNS object and 
-any available results from a previous analysis.
+Get information from individual slots in a TNS object and any
+available results from a previous analysis.
 }
 \examples{
 # load survival data
@@ -28,9 +30,9 @@ data(survival.data)
 # load TNI-object
 data(stni, package = "RTN")
 
-stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), 
-time = 1, event = 2)
-stns <- tnsGSEA2(stns, verbose=FALSE)
-enrichmentScores <- tnsGet(stns, 'EScores')
+stns <- tni2tnsPreprocess(stni, survivalData = survival.data, 
+keycovar = c('Grade','Age'), time = 1, event = 2)
+stns <- tnsGSEA2(stns)
+regulonActivity <- tnsGet(stns, 'regulonActivity')
 
 }

@@ -4,46 +4,31 @@
 \name{TNS-class}
 \alias{TNS-class}
 \alias{TNS}
-\title{TNS: An S4 class for survival survival analysis using transcriptional 
+\title{TNS: An S4 class for survival analysis using transcriptional 
 networks inferred by the RTN package.}
 \description{
-TNS: An S4 class for survival survival analysis using transcriptional 
+TNS: An S4 class for survival analysis using transcriptional 
 networks inferred by the RTN package.
 }
 \section{Slots}{
 
 \describe{
+\item{\code{TNI}}{a previously computed \linkS4class{TNI}-class object.}
+
 \item{\code{survivalData}}{a data frame containing the survival data for all samples. 
 Samples must be in the rows and the survival variables in the columns. 
 Time of last update and event in last update (0 for alive, 1 for deceased).}
 
-\item{\code{EScores}}{a list created by tnsGSEA2, containing the enrichment scores 
-for all samples}
+\item{\code{para}}{a list with the parameters used to compute the GSEA2 analysis.}
 
-\item{\code{keycovar}}{a string vector containing the key covariables used to 
-compute the Cox regression. They must be present in the survivalData table.}
-
-\item{\code{tni}}{a \linkS4class{TNI}-class object, previously computed. It is added 
-to the TNS via tnsGSEA2}
+\item{\code{results}}{a list with results from TNS methods.}
 
 \item{\code{status}}{a vector containing the processing status of the TNS object.}
-
-\item{\code{para}}{a list with the parameters used to compute the GSEA2 analysis.}
 }}
 
 \section{Constructor}{
 
 
-tnsPreprocess(tni, survivalData, keycovar, time = 1,
-              event = 2, samples = NULL)
-
-\itemize{
-\item {tni} - {a 'TNI' object.}
-\item {survivalData} - {a data.frame containing at least 2 columns}
-\item {keycovar} - {A character vector or NULL}
-\item {time} - {A numeric value or character vector}
-\item {event} - {A numeric value or character vector}
-\item {samples} - {A character vector}
-}
+see \code{\link{tni2tnsPreprocess}} constructor.
 }
 

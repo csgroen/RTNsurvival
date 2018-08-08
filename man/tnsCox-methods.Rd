@@ -4,54 +4,28 @@
 \name{tnsCox,TNS-method}
 \alias{tnsCox,TNS-method}
 \alias{tnsCox}
-\title{Cox regression analysis for TNS class objects.}
+\title{Cox regression analysis for TNS class objects}
 \usage{
-\S4method{tnsCox}{TNS}(tns, regs = NULL, endpoint = 60, fname = "coxplot",
-  fpath = ".", ylab = "Regulons and key covariates",
-  xlab = "Hazard Ratio (95\% CI)", qqkeycovar = FALSE, excludeMid = FALSE,
-  width = 5, height = 5, xlim = c(0.2, 10), sortregs = TRUE,
-  plotpdf = TRUE)
+\S4method{tnsCox}{TNS}(tns, regs = NULL, qqkeycovar = FALSE,
+  verbose = TRUE)
 }
 \arguments{
-\item{tns}{a \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
+\item{tns}{A \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
 
-\item{regs}{a string vector. Contains the regulons which will be used to 
-compute the Cox multivariate model. If left NULL, all regulons will be used.}
+\item{regs}{An optional string vector listing regulons to be tested.}
 
-\item{endpoint}{a numeric value. The final point in time for the samples. All
-time values larger than endpoint will be set at endpoint.}
+\item{qqkeycovar}{A logical value. If TRUE, only the samples in the 2nd and 
+3rd quartils of 'keycovar' are used in the analysis. If FALSE, all samples
+are used (see \code{\link{tni2tnsPreprocess}}).}
 
-\item{fname}{a string. The name of the PDF file which will contain the plot.}
-
-\item{fpath}{a string. The directory where the file will be saved.}
-
-\item{ylab}{a string. The label of the y-axis, describing what is represented.}
-
-\item{xlab}{a string. The label of the x-axis.}
-
-\item{qqkeycovar}{a logical value. If TRUE, only the samples in the 2nd and 
-3rd quarters of dES are used to compute. If FALSE, all samples are used.}
-
-\item{excludeMid}{a logical value. If TRUE, inconclusive dES values will not be
-consired in the survival analysis.}
-
-\item{width}{a numeric value. The width of the plot.}
-
-\item{height}{a numeric value. The height of the plot.}
-
-\item{xlim}{a vector with 2 values. The first value represents the lowest
-value in the x-axis, the second value is the highest.}
-
-\item{sortregs}{a logical value. If TRUE, regulons are sorted from most 
-negatively associated with hazard to most positively associated with hazard.}
-
-\item{plotpdf}{a logical value.}
+\item{verbose}{A logical value specifying to display detailed messages 
+(when verbose=TRUE) or not (when verbose=FALSE).}
 }
 \value{
-A Cox hazard model plot and statistics.
+Cox hazard models and statistics.
 }
 \description{
-Run Cox multivariate regression for regulons and key covariables.
+Run Cox multivariate regression for regulons and other covariates.
 }
 \examples{
 # load survival data
@@ -60,10 +34,10 @@ data(survival.data)
 # load TNI-object
 data(stni, package = "RTN")
 
-stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), 
-time = 1, event = 2)
-stns <- tnsGSEA2(stns, verbose=FALSE)
-tnsCox(stns, regs = c('PTTG1','E2F2','FOXM1'), sortregs = TRUE, 
-plotpdf = FALSE)
+stns <- tni2tnsPreprocess(stni, survivalData = survival.data, 
+keycovar = c('Age','Grade'), time = 1, event = 2)
+stns <- tnsGSEA2(stns)
+stns <- tnsCox(stns, regs = c('PTTG1','E2F2','FOXM1'))
+tnsGet(stns, "coxTable")
 
 }
