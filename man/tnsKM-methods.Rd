@@ -4,102 +4,28 @@
 \name{tnsKM,TNS-method}
 \alias{tnsKM,TNS-method}
 \alias{tnsKM}
-\title{Kaplan-Meier analysis for TNS class objects.}
+\title{Kaplan-Meier analysis for TNS class objects}
 \usage{
-\S4method{tnsKM}{TNS}(tns, regs = NULL, attribs = NULL, nSections = 2,
-  endpoint = 60, fname = "survplot", fpath = ".",
-  ylab = "Survival probability", xlab = "Months", pal = "redblue",
-  excludeMid = FALSE, flipcols = FALSE, plotpdf = TRUE,
-  plotbatch = FALSE, width = 6.3, height = 3.6, panelWidths = c(3, 2,
-  4), dES.ylab = "Samples", show.KMlegend = TRUE,
-  KMlegend.pos = "bottomleft", KMlegend.cex = 1, show.pval = TRUE,
-  pval.cex = 1, pval.pos = "topright")
+\S4method{tnsKM}{TNS}(tns, regs = NULL, nSections = 1, verbose = TRUE)
 }
 \arguments{
-\item{tns}{a \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
+\item{tns}{A \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
 
-\item{regs}{a string vector. Contains all the regulons which are going to be 
-plotted.}
+\item{regs}{An optional string vector listing regulons to be tested.}
 
-\item{attribs}{a numeric vector. Contains the columns of the survival 
-data.frame which will be plotted for the second panel.}
-
-\item{nSections}{A numeric value for the stratification of the sample. The 
-larger the number, the more subdivisions will be created for the Kaplan-Meier 
+\item{nSections}{A numeric value for sample stratification. The larger
+the number, the more subdivisions will be created for the Kaplan-Meier 
 analysis.}
 
-\item{endpoint}{a numeric value. It represents the cut-off point for the 
-'time', if any.}
-
-\item{fname}{a string. The name of the file in which the plot will be saved}
-
-\item{fpath}{a string. The path to the directory where the plot will be saved}
-
-\item{ylab}{a string. The label for the y axis on the third panel}
-
-\item{xlab}{a string. The label for the x axis on the third panel. This should
-be the measure of time shown in the survival data.frame after the last 
-check-up.}
-
-\item{pal}{a string, which can be 'red', 'blue' or 'redblue'. Represents the 
-colors used in the first and third panels. Alternatively, it can 
-contains the hex values.}
-
-\item{excludeMid}{a logical value. If TRUE, inconclusive dES values will not
-be consired in the survival analysis.}
-
-\item{flipcols}{a logical value. If TRUE, flips the order of the samples to 
-lowest expression on top, highest on the bottom.}
-
-\item{plotpdf}{a logical value. If TRUE, the plot is saved as a pdf file. 
-If false, it is plotted in the plotting area.}
-
-\item{plotbatch}{a logical value. If TRUE, plots for all regs are saved in 
-the same file.
-If FALSE, each plot for each reg is saved in a different file.}
-
-\item{width}{a numeric value. Represents the width of the plot.}
-
-\item{height}{a numeric value. Represents the height of the plot.}
-
-\item{panelWidths}{a numeric vector of length=3 specifying the relative 
-width of the internal panels.}
-
-\item{dES.ylab}{a string. The label for the y axis of the first panel.}
-
-\item{show.KMlegend}{a logical value. If TRUE, shows the sample stratification 
-information on the third panel.}
-
-\item{KMlegend.pos}{a string. Provides the location of the sample 
-stratification legend on the third panel. One of: 'bottomright', 
-'bottom', 'bottomleft', 'left', 
-'topleft', 'top', 'topright', 'right' and 'center'.}
-
-\item{KMlegend.cex}{a numeric value. Provides the character expansion factor 
-for the stratification legend, which alters the size and spacing of the font 
-in the legend.}
-
-\item{show.pval}{a logical value. If TRUE, shows the Logrank P-value for the 
-Kaplan-Meier plot on the third panel.}
-
-\item{pval.cex}{a numeric value. Provides the character expansion factor for 
-the pvalue legend, which alters the size and spacing of the font in the 
-legend.}
-
-\item{pval.pos}{a string. Provides the location of the Logrank P-value on 
-the third panel. One of: 'bottomright', 'bottom', 'bottomleft', 'left', 
-'topleft', 'top', 'topright', 'right' and 'center'.}
+\item{verbose}{A logical value specifying to display detailed messages 
+(when verbose=TRUE) or not (when verbose=FALSE).}
 }
 \value{
-A plot, showing the graphical analysis of provided survival data, including log-rank statistics.
+Results from 'survfit' and 'survdiff', including log-rank statistics.
 }
 \description{
-Makes a 2 or 3 panel plot for survival analysis. The first panel shows the
-differential Enrichment score (dES) for all samples, ranked by expression 
-in their sections. The second (optional) panel shows the status of other 
-attributes which may be present in the survival data.frame for all samples. 
-The third panel shows a Kaplan-Meier plot computed for the given survival 
-data, with a curve for each section.
+Creates survival curves and tests if there is a difference between 
+curves using 'survfit' and 'survdiff' functions, respectivelly.
 }
 \examples{
 # load survival data
@@ -108,10 +34,10 @@ data(survival.data)
 # load TNI-object
 data(stni, package = "RTN")
 
-stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), 
-time = 1, event = 2)
-stns <- tnsGSEA2(stns, verbose=FALSE)
-tnsKM(stns, regs='FOXM1', attribs = list(c('ER+','ER-'),c('G1','G2','G3')), 
-plotpdf = FALSE)
+stns <- tni2tnsPreprocess(stni, survivalData = survival.data, 
+        keycovar = c('Grade','Age'), time = 1, event = 2)
+stns <- tnsGSEA2(stns)
+stns <- tnsKM(stns)
+tnsGet(stns, "kmTable")
 
 }

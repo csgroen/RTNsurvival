@@ -4,21 +4,20 @@
 \name{tnsGSEA2,TNS-method}
 \alias{tnsGSEA2,TNS-method}
 \alias{tnsGSEA2}
-\title{2-tailed Gene Set Enrichment Analysis on Transcriptional Networks.}
+\title{2-tailed Gene Set Enrichment Analysis on Transcriptional Networks}
 \usage{
 \S4method{tnsGSEA2}{TNS}(tns, ...)
 }
 \arguments{
 \item{tns}{A \linkS4class{TNS} class, which has been preprocessed}
 
-\item{...}{Parameters passed to the \code{\link[RTN:tni.gsea2]{tni.gsea2}} 
-function.}
+\item{...}{Parameters passed to \code{\link{tni.gsea2}} function.}
 }
 \value{
 A \linkS4class{TNS} class, with added Enrichment Scores.
 }
 \description{
-Works as a wrapper for \code{\link[RTN:tni.gsea2]{tni.gsea2}}, performing a 
+Works as a wrapper for \code{\link{tni.gsea2}}, performing a 
 2-tailed GSEA analysis on a \linkS4class{TNI} class object and integrating 
 the results into the \linkS4class{TNS} class object.
 }
@@ -29,11 +28,22 @@ data(survival.data)
 # load TNI-object
 data(stni, package = "RTN")
 
-stns <- tnsPreprocess(stni, survival.data, keycovar = c('Grade','Age'), time = 1, event = 2)
-stns <- tnsGSEA2(stns, verbose=FALSE)
+stns <- tni2tnsPreprocess(stni, survivalData = survival.data, 
+keycovar = c('Grade','Age'), time = 1, event = 2)
+stns <- tnsGSEA2(stns)
+
+\dontrun{
+
+# parallel version with SNOW package!
+library(snow)
+options(cluster=makeCluster(3, "SOCK"))
+stns <- tnsGSEA2(stns)
+stopCluster(getOption("cluster"))
+
+}
 
 }
 \seealso{
-\code{\link[RTN:tni.gsea2]{tni.gsea2}} for information on all 
+\code{\link{tni.gsea2}} for information on all 
 parameters.
 }

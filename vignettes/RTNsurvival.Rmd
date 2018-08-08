@@ -41,7 +41,12 @@ summary <- tni.get(stni, what = "summary")
 
 The **RTNsurvival** package provides a survival table for the samples in the `stni` object, including clinical data from the METABRIC study [@Curtis2012] where the expression data was originally obtained.
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
+library(RTNsurvival)
+data(survival.data)
+```
+
+```{r, eval=TRUE, include=FALSE}
 library(RTNsurvival)
 data(survival.data)
 ```
@@ -51,15 +56,15 @@ data(survival.data)
 In order to run the analysis pipelines, the input data must be evaluated by the `tnsPreprocess` method in order to build a `TNS-class` object. Note that the survival table must be provided with time and event columns, and key covariates can also be specified for subsequent use in the Cox analysis.
 
 ```{r, eval=TRUE}
-rtns <- tnsPreprocess(stni, survival.data, keycovar = c("Grade","Age"), time = 1, event = 2)
+rtns <- tni2tnsPreprocess(stni, survivalData = survival.data, time = 1, event = 2, endpoint = 120, keycovar = c("Grade","Age"))
 ```
 
 ## Compute regulon activity
 
 The survival analysis pipeline depends on the 2-tailed GSEA approach, which estimates regulon activity (dES) for all samples in the cohort. The `tnsGSEA2` function calls the `tni.gsea2` method available in the RTN package.
 
-```{r, eval=TRUE}
-rtns <- tnsGSEA2(rtns, verbose = FALSE)
+```{r, eval=TRUE, results='hide'}
+rtns <- tnsGSEA2(rtns)
 ```
 
 ## Run the Cox analysis pipeline
@@ -68,8 +73,12 @@ Once the dES metric has been computed by `tnsGSEA2` function, then it is possibl
 
 The `tnsCox` method runs a Cox multivariate regression analysis and shows the proportional hazards of each of the specified regulons and the provided key covariates, indicating the contribution of each variable to survival (**Figure 1**). The method uses the Bioconductor survival package to fit the Cox model.
 
-```{r, eval=TRUE}
-tnsCox(rtns, sortregs = TRUE)
+```{r, eval=FALSE}
+rtns <- tnsCox(rtns)
+```
+
+```{r, eval=TRUE, include=FALSE}
+rtns <- tnsCox(rtns)
 ```
 
 ![title](figures/fig1.png)
@@ -79,9 +88,13 @@ tnsCox(rtns, sortregs = TRUE)
 
 The `tnsKM` method generates a Kaplan-Meier plot, which consists of three panels put together: a ranked dES plot for the cohort, a status of key attributes plot (optional) and a Kaplan-Meier plot, showing survival curves for lower and higher dES samples (**Figure 2**).
 
-```{r, eval=TRUE}
-tnsKM(rtns, regs="FOXM1", attribs = list(c("ER+","ER-"),c("PR+","PR-"),c("G1","G2","G3"),"HT"), 
-endpoint=180)
+```{r, eval=FALSE}
+rtns <- tnsKM(rtns)
+tnsPlotKM(rtns, regs="FOXM1", attribs = list(c("ER+","ER-"),c("PR+","PR-"),c("G1","G2","G3"),"HT"))
+```
+
+```{r, eval=TRUE, include=FALSE}
+rtns <- tnsKM(rtns)
 ```
 
 ![title](figures/fig2.png)
@@ -91,8 +104,12 @@ endpoint=180)
 
 Individual sample differential enrichment analysis can be investigated using the `tnsPlotGSEA2` function. This will generate a 2-tailed GSEA plot for the differential expression of both positive and negative targets of a regulon (**Figure 3**). This step takes a little longer because the GSEA is recomputed for a selected regulon, and because `tnsPlotGSEA2` is a wrapper for the **RTN** function `tna.plot.gsea2`, which generates the GSEA plot.
 
-```{r, eval=TRUE}
-tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1", verbose = FALSE)
+```{r, eval=FALSE}
+tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1")
+```
+
+```{r, eval=TRUE, include=FALSE}
+tnsPlotGSEA2(rtns, "MB-5115", regs = "FOXM1")
 ```
 
 ![title](figures/fig3.png)
@@ -106,51 +123,16 @@ An overview of regulon activity can be obtained by plotting a heatmap with all e
 library(pheatmap)
 enrichmentScores <- tnsGet(rtns, "EScores")
 survival.data <- tnsGet(rtns, "survivalData")
-annotationBars <- survival.data[,c("ER+", "ER-")]
-pheatmap(t(enrichmentScores$dif),
-        annotation_col = annotationBars,
-        main = "Differential Enrichment Scores (dES) for tumour samples",
-        show_colnames = FALSE,
-        annotation_legend = FALSE)
+annotation_col <- survival.data[,c("ER+", "ER-")]
+pheatmap(t(enrichmentScores$dif), 
+         annotation_col = annotation_col,
+         show_colnames = FALSE, 
+         annotation_legend = FALSE)
 ```
+
 
 ![title](figures/fig4.png)
-<b>Figure 4</b> - Regulon activity of individual tumour samples. This heatmap shows two main regulon clusters. The PGR and MYB regulons are repressed in the ER- samples and activated in ER+ samples. The PTTG1, E2F2 and FOXM1 regulons, on the other hand, are activated in ER- samples and repressed in ER+ samples. 
-
-# Evaluating survival in dual regulons
-
-Integrating data from different regulons may be of interest, especially if they come from different regulatory networks made for the same expression matrix. Concepts from the **RTNduals** package can be used to compute dual regulons, which are regulon pairs whose common targets are likely to be affected by both regulators.
-
-The workflow of the **RTNduals** can be used to infer dual TF-TF regulons, using the  precomputed regulons from this Vignette, for demonstration purposes only.
-
-```{r}
-library(RTNduals)
-smbr <- tni2mbrPreprocess(stni, verbose = FALSE)
-smbr <- mbrAssociation(smbr, pValueCutoff = 0.05, verbose = FALSE)
-mbrGet(smbr, "dualsCorrelation")
-```
-
-The `smbr` is an object of `MBR-class`, containing the motifs between the regulons represented in the `stni` object. 
-Now, since the `rtns` object and `smbr` object were computed from the same expression matrix, we can use the survival information for that cohort in conjunction with the duals information.
-
-```{r, eval = FALSE}
-duals <- mbrGet(smbr, what="dualRegulons")
-dualSurvivalPanel(smbr, rtns, dual = duals[1], attribs = c("ER+", "ER-", "PR+", "PR-"))
-```
-
-The `dualsSurvivalPanel` method generated a directory containing six plots:
-<ul>
-<li> a sample stratification for regulon 1 of the dual, with sample attributes;</li>
-<li> a sample stratification for regulon 2 of the dual, with the same attributes;</li>
-<li> an interaction scatter plot of the samples, where x and y represent that sample's position in the stratifications;</li>
-<li> Kaplan-Meier curves for both regulons, using their stratifications, and for the interaction between them, with the selected samples;</li>
-<li> a Cox regression plot, showing the association of both regulon activities with risk, as well as the association of the interaction; and</li>
-<li> a panel plot which contains all of these plots in a suggested panel, which is shown in **Figure 5**.</li>
-</ul>
-
-![title](figures/fig5.png)
-<b>Figure 5</b> - Dual Survival Plot for MYB~PGR dual regulon. It shows the regulon activity is positively correlated, but there is no additional hazard ratio information given by the Cox regression of the interaction. **a)** Sample ranking using differential Enrichment Score (dES) of regulon MYB **b)** dES sample ranking for regulon PGR and a sample scatter plot, showing the ranking of each sample in both regulons. In this case, MYB and PGR agree in sample stratification. **c)** Kaplan-Meier curves. The Interaction curve follows the individual regulons very closely. **d)** Cox regression plot. It doesn't show any association between the activity of these regulons or interaction and hazard ratio.
-
+<b>Figure 4</b> - Regulon activity of individual tumour samples. This heatmap shows two regulon clusters. The PGR and MYB regulons are repressed in the ER- samples and activated in ER+ samples. The PTTG1, E2F2 and FOXM1 regulons, on the other hand, are activated in ER- samples and repressed in ER+ samples. 
 
 # Session information
 ```{r label='Session information', eval=TRUE, echo=FALSE}
@@ -158,4 +140,5 @@ sessionInfo()
 ```
 
 # References
+
 
