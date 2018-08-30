@@ -4,7 +4,7 @@
 \alias{tnsStratification}
 \title{Sample stratification for a TNS object}
 \usage{
-tnsStratification(tns, nSections = 2, setMid = FALSE)
+tnsStratification(tns, nSections = 1, center = FALSE)
 }
 \arguments{
 \item{tns}{a \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
@@ -13,8 +13,8 @@ tnsStratification(tns, nSections = 2, setMid = FALSE)
 larger the number, the more subdivisions will be created for the Kaplan-Meier 
 analysis.}
 
-\item{setMid}{a logical value. If it is TRUE, it assigns "zero" to the middle strata, 
-centralizing the stratification on regulon activity.}
+\item{center}{a logical value. If TRUE, numbers assigned to each group is
+centralized on regulon activity scale.}
 }
 \value{
 An updated \linkS4class{TNS} object.

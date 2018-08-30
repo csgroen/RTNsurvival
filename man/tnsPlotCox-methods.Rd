@@ -8,8 +8,8 @@
 \usage{
 \S4method{tnsPlotCox}{TNS}(tns, regs = NULL, fname = "coxplot",
   fpath = ".", ylab = "Regulons and other covariates",
-  xlab = "Hazard Ratio (95\% CI)", width = 5, height = 5, xlim = c(0.3,
-  3), sortregs = TRUE, plotpdf = FALSE)
+  xlab = "Hazard Ratio (95\% CI)", width = 5, height = 5,
+  xlim = c(0.3, 3), sortregs = TRUE, plotpdf = FALSE)
 }
 \arguments{
 \item{tns}{A \linkS4class{TNS} object, which must have passed GSEA2 analysis.}

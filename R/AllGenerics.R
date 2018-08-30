@@ -6,8 +6,12 @@ setGeneric("tni2tnsPreprocess",
              standardGeneric("tni2tnsPreprocess"), package = "RTNsurvival")
 
 setGeneric("tnsGSEA2", 
-           function(tns, ...) 
+           function(tns, ...)
              standardGeneric("tnsGSEA2"), package = "RTNsurvival")
+
+setGeneric("tnsAREA3", 
+           function(tns, ...)
+             standardGeneric("tnsAREA3"), package = "RTNsurvival")
 
 setGeneric("tnsKM", 
            function(tns, regs = NULL, nSections = 1, verbose = TRUE) 

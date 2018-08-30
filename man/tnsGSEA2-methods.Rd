@@ -4,17 +4,17 @@
 \name{tnsGSEA2,TNS-method}
 \alias{tnsGSEA2,TNS-method}
 \alias{tnsGSEA2}
-\title{2-tailed Gene Set Enrichment Analysis on Transcriptional Networks}
+\title{Compute regulon activity using 2-tailed Gene Set Enrichment Analysis}
 \usage{
 \S4method{tnsGSEA2}{TNS}(tns, ...)
 }
 \arguments{
 \item{tns}{A \linkS4class{TNS} class, which has been preprocessed}
 
-\item{...}{Parameters passed to \code{\link{tni.gsea2}} function.}
+\item{...}{Additional parameters passed to \code{\link{tni.gsea2}} function.}
 }
 \value{
-A \linkS4class{TNS} class, with added Enrichment Scores.
+A \linkS4class{TNS} class, with added regulon activity scores.
 }
 \description{
 Works as a wrapper for \code{\link{tni.gsea2}}, performing a 
