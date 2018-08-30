@@ -305,13 +305,13 @@
     if(object1@status["Preprocess"] != "[x]") 
       stop("NOTE: TNS object requires preprocessing!", call. = FALSE)
   }
-  else if (type == "TNSgsea2"){
+  else if (type == "Activity"){
     if(class(object1)!='TNS')
       stop("NOTE: 'tns' must be an object of class 'TNS'!", call. = FALSE)
     if(object1@status["Preprocess"] != "[x]") 
       stop("NOTE: TNS object requires preprocessing!", call. = FALSE)
-    if(object1@status["GSEA2"] != "[x]") 
-      stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2'!", 
+    if(object1@status["Activity"] != "[x]") 
+      stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2' or 'tnsVIPER'!", 
            call. = FALSE)
   } 
   else if(type == "MBR"){
@@ -349,9 +349,9 @@
       stop("'nSections' must be a number between 1 and 3.", call. = FALSE)
     }
   } 
-  else if(type == "setMid"){
+  else if(type == "center"){
     if (!is.singleLogical(object1)) 
-      stop("'setMid' must be logical value.", call. = FALSE)
+      stop("'center' must be logical value.", call. = FALSE)
   }
   else if(type == "cols") {
     if(!is.color(object1))

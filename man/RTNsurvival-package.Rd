@@ -28,7 +28,7 @@ biocViews: \tab NetworkInference, NetworkEnrichment, GeneRegulation, GeneExpress
 \tabular{ll}{
 \link{TNS-class}: \tab an S4 class for survival survival analysis using RTN transcriptional networks.\cr
 \link{tni2tnsPreprocess}: \tab a preprocessing method for objects of class TNS.\cr
-\link{tnsGSEA2}: \tab two-tailed gene set enrichment analysis (GSEA) over a list of regulons.\cr
+\link{tnsGSEA2}: \tab compute regulon activity by calling 'GSEA2' algorithm.\cr
 \link{tnsPlotGSEA2}: \tab plot results from the two-tailed GSEA.\cr
 \link{tnsKM}: \tab Kaplan-Meier analysis for TNS class objects.\cr
 \link{tnsPlotKM}: \tab Kaplan-Meier plots for TNS class objects.\cr
@@ -41,6 +41,7 @@ biocViews: \tab NetworkInference, NetworkEnrichment, GeneRegulation, GeneExpress
 \link{tnsCoxInteraction}: \tab Cox regression analysis for dual regulons.\cr
 \link{tnsPlotCoxInteraction}: \tab Plot results from Cox regression analysis for dual regulons.\cr
 \link{tnsPlotGSEA2}: \tab Plot 2-tailed GSEA for a sample from a TNS.\cr
+\link{tnsAREA3}: \tab compute regulon activity by calling 'aREA3' algorithm.\cr
 }
 
 Further information is available in the vignettes by typing \code{vignette("RTNsurvival")}. Documented 

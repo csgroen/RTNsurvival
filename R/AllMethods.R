@@ -107,15 +107,15 @@ setMethod("tni2tnsPreprocess", "TNI",
           })
 
 
-#' 2-tailed Gene Set Enrichment Analysis on Transcriptional Networks
+#' Compute regulon activity using 2-tailed Gene Set Enrichment Analysis
 #'
 #' Works as a wrapper for \code{\link{tni.gsea2}}, performing a 
 #' 2-tailed GSEA analysis on a \linkS4class{TNI} class object and integrating 
 #' the results into the \linkS4class{TNS} class object.
 #'
 #' @param tns A \linkS4class{TNS} class, which has been preprocessed
-#' @param ... Parameters passed to \code{\link{tni.gsea2}} function.
-#' @return A \linkS4class{TNS} class, with added Enrichment Scores.
+#' @param ... Additional parameters passed to \code{\link{tni.gsea2}} function.
+#' @return A \linkS4class{TNS} class, with added regulon activity scores.
 #' @examples
 #' # load survival data
 #' data(survival.data)
@@ -140,6 +140,7 @@ setMethod("tni2tnsPreprocess", "TNI",
 #' @seealso \code{\link{tni.gsea2}} for information on all 
 #' parameters.
 #' @importClassesFrom RTN TNI
+#' @importFrom RTN tni.gsea2
 #' @docType methods
 #' @rdname tnsGSEA2-methods
 #' @aliases tnsGSEA2
@@ -151,9 +152,70 @@ setMethod("tnsGSEA2", "TNS", function(tns, ...) {
   if (tns@status["Preprocess"] != "[x]") 
     stop("NOTE: TNS object requires preprocessing!")
   
+  #-- update para
+  para <- tnsGet(tns, what = "para")
+  para$regulonActivity <- "gsea2"
+  tns <- tns.set(tns, para, "para")
+  
   #-- run gsea2 and update TNS
   tni <- tnsGet(tns, what = "TNI")
-  regulonActivity <- tni.gsea2(tni, ... = ...)
+  regulonActivity <- tni.gsea2(tni, ...=...)
+  tns <- tns.set(tns, regulonActivity, "regulonActivity")
+  return(tns)
+})
+
+
+#' Compute regulon activity by calling aREA (analytic Rank-based Enrichment Analysis) algorithm
+#'
+#' Uses \code{\link{aREA}} 3-tail algorithm to compute regulon activity
+#' for \linkS4class{TNS} class objects.
+#'
+#' @param tns A \linkS4class{TNS} class, which has been preprocessed
+#' @param ... Additional parameters passed to \code{\link{tni.area3}} function.
+#' @return A \linkS4class{TNS} class, with added regulon activity scores.
+#' @references Alvarez et al. Functional characterization of somatic mutations in cancer
+#' using network-based inference of protein activity. Nature Genetics, 48(8):838-847, 2016.
+#' @examples
+#' # load survival data
+#' data(survival.data)
+#' 
+#' # load TNI-object
+#' data(stni, package = "RTN")
+#'
+#' stns <- tni2tnsPreprocess(stni, survivalData = survival.data, 
+#' keycovar = c('Grade','Age'), time = 1, event = 2)
+#' 
+#' stns <- tnsAREA3(stns)
+#'
+#' @seealso \code{\link{aREA}} for additional details.
+#' @importClassesFrom RTN TNI
+#' @importFrom RTN tni.area3
+#' @importFrom viper aREA
+#' @importFrom scales rescale
+#' @docType methods
+#' @rdname tnsAREA3-methods
+#' @aliases tnsAREA3
+#' @export
+#'
+setMethod("tnsAREA3", "TNS", function(tns, ...){
+  
+  #-- checks
+  if (tns@status["Preprocess"] != "[x]") 
+    stop("NOTE: TNS object requires preprocessing!")
+  
+  #-- update para
+  para <- tnsGet(tns, what = "para")
+  para$regulonActivity <- "aREA"
+  tns <- tns.set(tns, para, "para")
+  
+  #-- run area3
+  tni <- tnsGet(tns, what = "TNI")
+  regulonActivity <- tni.area3(tni, ...=...)
+  
+  #-- rescale to fit graphics
+  regulonActivity$dif <- apply(regulonActivity$dif, 2, rescale, to=c(-1.8, 1.8))
+  
+  #-- update TNA
   tns <- tns.set(tns, regulonActivity, "regulonActivity")
   return(tns)
 })
@@ -195,7 +257,7 @@ setMethod("tnsGSEA2", "TNS", function(tns, ...) {
 setMethod("tnsKM", "TNS", 
           function(tns, regs = NULL, nSections = 1, verbose = TRUE){
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(regs, type = "regs")
             .tns.checks(nSections, type = "nSections")
             .tns.checks(verbose, type = "verbose")
@@ -320,7 +382,7 @@ setMethod("tnsPlotKM", "TNS",
                    plotpdf = FALSE, plotbatch = FALSE, width = 6.3, 
                    height = 3.6, panelWidths = c(3, 2, 4)){
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(regs, type = "regs")
             .tns.checks(attribs, tns@survivalData, type = "attribs")
             .tns.checks(fname, type = "fname")
@@ -464,10 +526,10 @@ setMethod("tnsPlotKM", "TNS",
 #' 
 setMethod("tnsCox", "TNS", 
           function(tns, regs = NULL, qqkeycovar = FALSE, verbose = TRUE)
-            {
+          {
             
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(regs, type = "regs")
             .tns.checks(qqkeycovar, type = "qqkeycovar")
             .tns.checks(verbose, type = "verbose")
@@ -489,7 +551,7 @@ setMethod("tnsCox", "TNS",
             #-- checks
             dif <- regulonActivity$dif
             if (excludeMid) {
-              dif[regulonActivity$regstatus == regulonActivity$mid] <- NA
+              dif[regulonActivity$regstatus == regulonActivity$center] <- NA
             }
             
             if(!is.null(regs)) {
@@ -662,7 +724,7 @@ setMethod("tnsPlotCox", "TNS",
                    xlim = c(0.3, 3), sortregs = TRUE, plotpdf = FALSE){
             
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(regs, type = "regs")
             .tns.checks(fname, type = "fname")
             .tns.checks(fpath, type = "fpath")
@@ -879,7 +941,7 @@ setMethod("tnsKmInteraction", "TNS",
           function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE){
             
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(mbr, type = "MBR")
             .tns.checks(stepFilter, type = "stepFilter")
             .tns.checks(pValueCutoff, type = "pValueCutoff")
@@ -891,7 +953,7 @@ setMethod("tnsKmInteraction", "TNS",
             }
             
             #-- stratification
-            tns <- tnsStratification(tns, nSections = 1, setMid = TRUE)
+            tns <- tnsStratification(tns, nSections = 1, center = TRUE)
             
             #-- get data
             regulonActivity <- tnsGet(tns, what = "regulonActivity")
@@ -900,7 +962,7 @@ setMethod("tnsKmInteraction", "TNS",
             endpoint <- para$endpoint
             excludeMid <- para$excludeMid
             pAdjustMethod <- para$pAdjustMethod
-              
+            
             #-- set endpoint
             survData$event[survData$time > endpoint] <- 0
             survData$time[survData$time > endpoint] <- endpoint
@@ -1017,7 +1079,7 @@ setMethod("tnsPlotKmInteraction", "TNS",
                    height = 4, plotpdf = FALSE){
             
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(dualreg, type = "dualreg")
             .tns.checks(fname, type = "fname")
             .tns.checks(fpath, type = "fpath")
@@ -1029,7 +1091,7 @@ setMethod("tnsPlotKmInteraction", "TNS",
             .tns.checks(plotpdf, type = "plotpdf")
             
             #-- stratification
-            tns <- tnsStratification(tns, nSections = 1, setMid = TRUE)
+            tns <- tnsStratification(tns, nSections = 1, center = TRUE)
             
             #-- get data
             regulonActivity <- tnsGet(tns, what = "regulonActivity")
@@ -1059,13 +1121,13 @@ setMethod("tnsPlotKmInteraction", "TNS",
             .survplotDuals(regulonActivity, survData=survData, regs=regs, 
                            endpoint=endpoint, excludeMid=excludeMid, 
                            ylab=ylab, xlab=xlab, colorPalette=colorPalette)
-              if(plotpdf){
-                dev.off()
-                tp1 <- c("NOTE: file '",fname,
-                         "' should be available either in the\n")
-                tp2 <- c("working directory or in a user's custom directory!\n")
-                message(tp1,tp2)
-              }
+            if(plotpdf){
+              dev.off()
+              tp1 <- c("NOTE: file '",fname,
+                       "' should be available either in the\n")
+              tp2 <- c("working directory or in a user's custom directory!\n")
+              message(tp1,tp2)
+            }
             
           })
 
@@ -1119,10 +1181,10 @@ setMethod("tnsPlotKmInteraction", "TNS",
 setMethod("tnsCoxInteraction", "TNS",
           function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, 
                    verbose = TRUE)
-            {
+          {
             
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(mbr, type = "MBR")
             .tns.checks(stepFilter, type = "stepFilter")
             .tns.checks(pValueCutoff, type = "pValueCutoff")
@@ -1146,7 +1208,7 @@ setMethod("tnsCoxInteraction", "TNS",
               tnstatus <- tnsGet(tns, what = "status")
               if(tnstatus["Cox"] != "[x]"){
                 stop("NOTE: when 'stepFilter=TRUE', the TNS object needs to be evaluated by 'tnsCox'!", 
-                        call. = FALSE)
+                     call. = FALSE)
               }
               coxtb <- tnsGet(tns, what = "coxTable")
               coxtb <- coxtb[coxtb$Adjusted.Pvalue<=pValueCutoff, ]
@@ -1154,7 +1216,7 @@ setMethod("tnsCoxInteraction", "TNS",
               dualtb <- dualtb[idx,]
               if(nrow(dualtb)==0){
                 message("NOTE: using 'stepFilter=TRUE': no significant regulon from the 'tnsCox' method!",
-                     call. = FALSE)
+                        call. = FALSE)
                 return(tns)
               }
               dualregs <- rownames(dualtb)
@@ -1189,7 +1251,7 @@ setMethod("tnsCoxInteraction", "TNS",
             #-- checks
             dif <- regulonActivity$dif
             if (excludeMid) {
-              dif1[regulonActivity$regstatus == regulonActivity$mid] <- NA
+              dif1[regulonActivity$regstatus == regulonActivity$center] <- NA
             }
             
             #-- correct names for a 'formula'
@@ -1234,7 +1296,7 @@ setMethod("tnsCoxInteraction", "TNS",
               res
             })
             ci <- p.threshold(pvals=coxprobs, alpha=0.05, method=pAdjustMethod)
-
+            
             #--- get coefs
             coxcoefs <- sapply(dualregs, function(dual){
               cxmd <- coxFit[[dual]]
@@ -1336,7 +1398,7 @@ setMethod("tnsPlotCoxInteraction", "TNS",
                    plotpdf = FALSE){
             
             #-- checks
-            .tns.checks(tns, type = "TNSgsea2")
+            .tns.checks(tns, type = "Activity")
             .tns.checks(dualreg, type = "dualreg")
             if(!is.null(xlim)) .tns.checks(xlim, type = "xlim_reg")
             if(!is.null(ylim)) .tns.checks(ylim, type = "ylim_reg")
@@ -1354,7 +1416,7 @@ setMethod("tnsPlotCoxInteraction", "TNS",
             if(tnstatus["CoxInt"] != "[x]")
               stop("NOTE: TNS object needs to be evaluated by 'tnsCoxInteraction'!", 
                    call. = FALSE)
-                     
+            
             #-- get regs
             regs <- unlist(strsplit(dualreg, split = "~", fixed=TRUE))
             
@@ -1391,7 +1453,7 @@ setMethod("tnsPlotCoxInteraction", "TNS",
             
             #--- set colorPalette
             if(showdata){
-              tns <- tnsStratification(tns, nSections = 1, setMid = TRUE)
+              tns <- tnsStratification(tns, nSections = 1, center = TRUE)
               regulonActivity <- tnsGet(tns, "regulonActivity")
               excludeMid <- tnsGet(tns, what = "para")$excludeMid
               regstatus <- .getSurvplotCols(regulonActivity, regs, excludeMid, colorPalette)

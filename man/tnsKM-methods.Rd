@@ -6,7 +6,8 @@
 \alias{tnsKM}
 \title{Kaplan-Meier analysis for TNS class objects}
 \usage{
-\S4method{tnsKM}{TNS}(tns, regs = NULL, nSections = 1, verbose = TRUE)
+\S4method{tnsKM}{TNS}(tns, regs = NULL, nSections = 1,
+  verbose = TRUE)
 }
 \arguments{
 \item{tns}{A \linkS4class{TNS} object, which must have passed GSEA2 analysis.}

@@ -8,9 +8,9 @@
 \usage{
 \S4method{tnsPlotCoxInteraction}{TNS}(tns, dualreg, xlim = NULL,
   ylim = NULL, hlim = NULL, hcols = c("#008080ff", "#d45500ff"),
-  showdata = TRUE, colorPalette = "bluered", fname = "coxInteraction",
-  fpath = ".", width = 4.5, height = 4, plotype = "3D",
-  plotpdf = FALSE)
+  showdata = TRUE, colorPalette = "bluered",
+  fname = "coxInteraction", fpath = ".", width = 4.5, height = 4,
+  plotype = "3D", plotpdf = FALSE)
 }
 \arguments{
 \item{tns}{A `TNS` object with regulons used to compute the dual regulon.}

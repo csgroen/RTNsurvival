@@ -7,8 +7,8 @@
 #' @param nSections A numeric value for the stratification of the sample. The 
 #' larger the number, the more subdivisions will be created for the Kaplan-Meier 
 #' analysis.
-#' @param setMid a logical value. If it is TRUE, it assigns "zero" to the middle strata, 
-#' centralizing the stratification on regulon activity.
+#' @param center a logical value. If TRUE, numbers assigned to each group is
+#' centralized on regulon activity scale.
 #' 
 #' @return An updated \linkS4class{TNS} object.
 #' @examples
@@ -18,28 +18,33 @@
 #' @aliases tnsStratification
 #' @export
 #' 
-tnsStratification <- function(tns, nSections = 2, setMid = FALSE){
+tnsStratification <- function(tns, nSections = 1, center = FALSE){
   
   #-- checks
   .tns.checks(tns, type = "TNS")
   .tns.checks(nSections, type = "nSections")
-  .tns.checks(setMid, type = "setMid")
+  .tns.checks(center, type = "center")
   
   #-- stratification
-  tns <- .tns.stratification(tns, nSections = nSections, setMid = setMid)
+  para <- tnsGet(tns, what = "para")
+  if(para$regulonActivity=="gsea2"){
+    tns <- .tns.stratification.gsea2(tns, nSections = nSections, center = center)
+  } else {
+    tns <- .tns.stratification.area(tns, nSections = nSections, center = center)
+  }
   
   return(tns)
   
 }
 
 ##------------------------------------------------------------------------------
-.tns.stratification <- function(object, nSections = 2, setMid=FALSE){
-  regstatus <- sign(object@results$regulonActivity$dif)
+.tns.stratification.gsea2 <- function(tns, nSections=1, center=TRUE){
+  regstatus <- sign(tns@results$regulonActivity$dif)
   for (reg in colnames(regstatus)){
     sq <- c(seq_len(nSections))
-    pos <- object@results$regulonActivity$pos[, reg]
-    neg <- object@results$regulonActivity$neg[, reg]
-    dif <- object@results$regulonActivity$dif[, reg]
+    pos <- tns@results$regulonActivity$pos[, reg]
+    neg <- tns@results$regulonActivity$neg[, reg]
+    dif <- tns@results$regulonActivity$dif[, reg]
     #---
     regstatus[sign(pos) == sign(neg), reg] <- 0
     tp <- regstatus[, reg]
@@ -55,15 +60,46 @@ tnsStratification <- function(tns, nSections = 2, setMid = FALSE){
   mid <- nSections + 1
   regstatus[regstatus == 0] <- mid
   #---
-  if(setMid){
+  if(center){
     regstatus <- -1 * (regstatus - mid)
     mid <- 0
   }
   #---
-  object@results$regulonActivity$regstatus <- regstatus
-  object@results$regulonActivity$nSections <- nSections
-  object@results$regulonActivity$mid <- mid
-  return(object)
+  tns@results$regulonActivity$regstatus <- regstatus
+  tns@results$regulonActivity$nSections <- nSections
+  tns@results$regulonActivity$center <- mid
+  return(tns)
+}
+##------------------------------------------------------------------------------
+.tns.stratification.area <- function(tns, nSections=1, center=FALSE){
+  regstatus <- sign(tns@results$regulonActivity$dif)
+  for (reg in colnames(regstatus)){
+    sq <- c(seq_len(nSections))
+    dif <- tns@results$regulonActivity$dif[, reg]
+    tp <- regstatus[, reg]
+    #---
+    tp1 <- sort(dif[tp > 0], decreasing = TRUE)
+    tp1[] <- rep(sq, each = ceiling(length(tp1)/nSections), length.out = length(tp1))
+    regstatus[names(tp1), reg] <- tp1
+    #---
+    tp2 <- sort(dif[tp < 0], decreasing = TRUE)
+    tp2[] <- rep(sq + nSections + 1, each = ceiling(length(tp2)/nSections), length.out = length(tp2))
+    regstatus[names(tp2), reg] <- tp2
+  }
+  #--- obs. this stratification generates a 'midle' group 
+  #--- only when there are samples with regulon activity assigned with 0 or NA
+  mid <- nSections + 1
+  regstatus[regstatus == 0 | is.na(regstatus)] <- mid
+  #---
+  if(center){
+    regstatus <- -1 * (regstatus - mid)
+    mid <- 0
+  }
+  #---
+  tns@results$regulonActivity$regstatus <- regstatus
+  tns@results$regulonActivity$nSections <- nSections
+  tns@results$regulonActivity$center <- mid
+  return(tns)
 }
 
 ##------------------------------------------------------------------------------
@@ -253,8 +289,7 @@ tnsStratification <- function(tns, nSections = 2, setMid = FALSE){
 }
 
 ##------------------------------------------------------------------------------
-pal1 <- function(nclass)
-{
+pal1 <- function(nclass){
   pt <- rev(colorRampPalette(brewer.pal(9, "Reds"))(11))
   if (nclass == 1){
     cols <- "grey80"
@@ -273,8 +308,7 @@ pal1 <- function(nclass)
 }
 
 ##------------------------------------------------------------------------------
-pal2 <- function(nclass)
-{
+pal2 <- function(nclass){
   pt <- rev(colorRampPalette(brewer.pal(9, "Blues"))(11))
   if (nclass == 1){
     cols <- "grey80"
@@ -292,8 +326,7 @@ pal2 <- function(nclass)
 }
 
 ##------------------------------------------------------------------------------
-pal3 <- function(nclass)
-{
+pal3 <- function(nclass){
   ptreds <- rev(colorRampPalette(brewer.pal(9, "Reds"))(11))
   ptblues <- rev(colorRampPalette(brewer.pal(9, "Blues"))(11))
   if (nclass == 1){
@@ -420,18 +453,17 @@ pal3 <- function(nclass)
   list(labs = tp, at = xat)
 }
 ##------------------------------------------------------------------------------
-tns.set <- function(object, para = NULL, what)
-{
+tns.set <- function(object, para = NULL, what){
   if (what == "status"){
     object@status["Preprocess"] <- "[x]"
-    object@status["GSEA2"] <- "[ ]"
+    object@status["Activity"] <- "[ ]"
     object@status["KM"] <- "[ ]"
     object@status["KmInt"] <- "[ ]"
     object@status["Cox"] <- "[ ]"
     object@status["CoxInt"] <- "[ ]"
   } else if (what == "regulonActivity"){
     object@results$regulonActivity <- para
-    object@status["GSEA2"] <- "[x]"
+    object@status["Activity"] <- "[x]"
   } else if (what == "KM"){
     object@results$KM <- para
     object@status["KM"] <- "[x]"
@@ -454,7 +486,7 @@ tns.set <- function(object, para = NULL, what)
 
 ##------------------------------------------------------------------------
 ##returns rejection threshold for methods in 'p.adjust'
-p.threshold <- function (pvals, alpha=0.05, method="BH") {
+p.threshold <- function (pvals, alpha=0.05, method="BH"){
   pvals <- sort(pvals)
   padj <- p.adjust(pvals, method = method)
   thset <- which(padj <= alpha)
