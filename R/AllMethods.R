@@ -167,7 +167,7 @@ setMethod("tnsGSEA2", "TNS", function(tns, ...) {
 
 #' Compute regulon activity by calling aREA (analytic Rank-based Enrichment Analysis) algorithm
 #'
-#' Uses \code{\link{aREA}} 3-tail algorithm to compute regulon activity
+#' Uses \code{\link{tni.area3}} function to compute regulon activity
 #' for \linkS4class{TNS} class objects.
 #'
 #' @param tns A \linkS4class{TNS} class, which has been preprocessed
@@ -187,10 +187,9 @@ setMethod("tnsGSEA2", "TNS", function(tns, ...) {
 #' 
 #' stns <- tnsAREA3(stns)
 #'
-#' @seealso \code{\link{aREA}} for additional details.
+#' @seealso \code{\link{tni.area3}} for additional details.
 #' @importClassesFrom RTN TNI
 #' @importFrom RTN tni.area3
-#' @importFrom viper aREA
 #' @importFrom scales rescale
 #' @docType methods
 #' @rdname tnsAREA3-methods

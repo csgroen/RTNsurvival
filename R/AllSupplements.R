@@ -143,7 +143,6 @@ tnsStratification <- function(tns, nSections = 1, center = FALSE){
   #--- third panel plot (Kaplan-Meier)
   if (excludeMid && nclass%%2 != 0 && nclass > 1){
     rmc <- (nclass + 1)/2
-    cols <- cols[-rmc]
     idx <- regstatus != rmc
     regstatus <- regstatus[idx]
     tumours <- tumours[idx]

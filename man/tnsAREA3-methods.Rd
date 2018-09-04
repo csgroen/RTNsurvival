@@ -17,7 +17,7 @@
 A \linkS4class{TNS} class, with added regulon activity scores.
 }
 \description{
-Uses \code{\link{aREA}} 3-tail algorithm to compute regulon activity
+Uses \code{\link{tni.area3}} function to compute regulon activity
 for \linkS4class{TNS} class objects.
 }
 \examples{
@@ -38,5 +38,5 @@ Alvarez et al. Functional characterization of somatic mutations in cancer
 using network-based inference of protein activity. Nature Genetics, 48(8):838-847, 2016.
 }
 \seealso{
-\code{\link{aREA}} for additional details.
+\code{\link{tni.area3}} for additional details.
 }
