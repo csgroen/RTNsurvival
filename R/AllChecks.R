@@ -122,11 +122,15 @@
           stop("all 'attribs' must be listed in the 'survivalData' colnames, at the 'tns' object!", 
                call. = FALSE)
       } else if (!all.integerValues(object1)){
-        stop("'attribs' must be either a vector or a list of vectors, with either integer or character values!", 
+        stop("'attribs' must be either a vector or a list of vectors, with either integer values!", 
              call. = FALSE)
       }
     }
-  } 
+  }
+    else if (type == "attribs2") {
+        if(!is.character(object1) && !all(object1 %in% colnames(object2)))
+            stop("'attribs' must be a character vector of column names in 'survivalData'.")
+    }
   else if (type == "colorPalette"){
     len <- (object2 * 2) + 1
     tp1 <- "'colorPalette' must be 'red', 'blue', 'redblue' or 'bluered'"
@@ -289,6 +293,24 @@
       stop("The width of the first and third panels cannot be 0.", 
            call. = FALSE)
   } 
+    else if (type == "panelHeights"){
+        if (!is.numeric(object1) || length(object1) != 2) 
+            stop("'panelWidths' must be a numeric vector of length 2.", 
+                 call. = FALSE)
+        if (any(object1 == 0)) 
+            stop("The widths of the panels cannot be 0.", 
+                 call. = FALSE)
+    }
+    else if (type == "dummyEncode") {
+        if(!is.singleLogical(object1) && !(object1 %in% colnames(object2))) {
+            stop("`dummyEncode` must be either a logical value or a character vector of names of columns to dummy encode.")
+        }
+    }
+    else if (type == "divs") {
+        if (!is.numeric(object1)) {
+            stop("'divs' must be a numeric vector.")
+        }
+    }
   else if (type == "TNI"){
     if(class(object1)!='TNI')
       stop("NOTE: 'tni' must be an object of class 'TNI'!", call. = FALSE)
@@ -363,6 +385,44 @@
       stop("NOTE: 'hcols' should be a vector (length = 2) with valid colors!", 
            call.=FALSE)
   }
+    else if(type == "subgroup") {
+        if (!is.numeric(object1) && !is.character(object1)) {
+            stop("`subgroup` must be a numeric or character value.")
+        }
+        if (is.numeric(object1)) {
+            if (object1 > ncol(object2) || object1 < 0) {
+                stop("`subgroup` must be > 0 and < number of features in the column annotation")
+            }
+        } else {
+            if(!(object1 %in% colnames(object2))) {
+                stop("`subgroup` doesn't correspond to a column in the column annotation")
+            }
+        }
+        gvec <- object2[,object1]
+        if(!any(duplicated(gvec))){
+            stop("`subgroup` column doesn't contain useful information to divide the samples into subgroups")
+        }
+    }
+    else if(type == "nGroupsEnriched") {
+        if (!is.singleNumber(object1)) {
+            stop("`nGroupsEnriched` must be a single integer.")
+        }
+    }
+    else if(type == "nTopEnriched") {
+        if (!is.singleNumber(object1)) {
+            stop("`nTopEnriched` must be a single integer.")
+        }
+    }
+    else if(type == "breaks") {
+        if(!is.numeric(object1)) {
+            stop("`breaks` must be a numeric vector")
+        }
+    }
+    else if(type == "markEnriched") {
+        if(!is.singleLogical(object1)) {
+            stop("`markEnriched` must be a single logical value.")
+        }
+    }
 }
 
 is.singleNumber <- function(para){
