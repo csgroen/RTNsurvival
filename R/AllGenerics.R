@@ -66,9 +66,35 @@ setGeneric("tnsPlotCoxInteraction",
                     fpath = ".", width = 5, height = 4, plotype = "3D", plotpdf = FALSE) 
              standardGeneric("tnsPlotCoxInteraction"), package = "RTNsurvival")
 
+setGeneric("tnsPlotCoxInteraction",
+           function(tns, dualreg, xlim = NULL, ylim = NULL, hlim = NULL, 
+                    hcols = c("#008080ff","#d45500ff"), showdata = TRUE, 
+                    colorPalette = "bluered", fname = "coxInteraction", 
+                    fpath = ".", width = 5, height = 4, plotype = "3D", plotpdf = FALSE) 
+               standardGeneric("tnsPlotCoxInteraction"), package = "RTNsurvival")
+
 setGeneric("tnsPlotGSEA2",
            function(tns, aSample, regs = NULL, refsamp = NULL, checklog = FALSE, 
                     ntop = NULL, pValueCutoff = 0.05, pAdjustMethod = "BH", 
                     verbose = TRUE, plotpdf = FALSE, ...) 
              standardGeneric("tnsPlotGSEA2"), package = "RTNsurvival")
+
+setGeneric("tnsPlotCovariates",
+           function(tns, regs = NULL, attribs = NULL, fname = "covarplot", 
+                    fpath = ".", plotpdf = FALSE, plotbatch = FALSE,
+                    panelHeights = c(1,1), width = 5.3, height = 4,
+                    dummyEncode = TRUE, divs = NULL)
+               standardGeneric("tnsPlotCovariates"), package = "RTNsurvival")
+
+setGeneric("tnsSRE",
+           function(tns, subgroup, regs = NULL, pValueCutoff = 0.05, 
+                    pAdjustMethod = "BH")
+               standardGeneric("tnsSRE"), package = "RTNsurvival")
+
+setGeneric("tnsPlotSRE",
+           function(tns, subgroup = NULL, by = "nGroups",
+                    nGroupsEnriched = 1, nTopEnriched = 10, 
+                    breaks = seq(-1.5, 1.5, 0.1),
+                    markEnriched = FALSE, ...)
+               standardGeneric("tnsPlotSRE"), package = "RTNsurvival")
 
