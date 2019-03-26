@@ -6,14 +6,11 @@
 \alias{tnsKmInteraction}
 \title{Kaplan-Meier analysis for dual regulons}
 \usage{
-\S4method{tnsKmInteraction}{TNS}(tns, mbr, stepFilter = TRUE,
+\S4method{tnsKmInteraction}{TNS}(tns, stepFilter = TRUE,
   pValueCutoff = 0.05, verbose = TRUE)
 }
 \arguments{
 \item{tns}{A \linkS4class{TNS} object, which must have passed GSEA2 analysis.}
-
-\item{mbr}{An \linkS4class{MBR} object computed from the same 'TNI' object used
-to make the 'TNS' object.}
 
 \item{stepFilter}{A single logical value specifying to use a step-filter 
 algorithm, testing dual regulons that have at least one significant predictor
@@ -42,12 +39,8 @@ stns <- tni2tnsPreprocess(stni, survivalData = survival.data,
 keycovar = c('Grade','Age'), time = 1, event = 2)
 stns <- tnsGSEA2(stns)
 
-# infer dual regulons
-smbr <- tni2mbrPreprocess(stni)
-smbr <- mbrAssociation(smbr)
-
 # KM analysis for dual regulons
-# stns <- tnsKmInteraction(stns, smbr, stepFilter = FALSE)
+# stns <- tnsKmInteraction(stns, stepFilter = FALSE)
 # tnsGet(stns, "kmInteractionTable")
 
 }

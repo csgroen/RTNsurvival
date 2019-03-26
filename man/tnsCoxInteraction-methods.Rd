@@ -6,14 +6,11 @@
 \alias{tnsCoxInteraction}
 \title{Cox regression analysis for dual regulons}
 \usage{
-\S4method{tnsCoxInteraction}{TNS}(tns, mbr, stepFilter = TRUE,
+\S4method{tnsCoxInteraction}{TNS}(tns, stepFilter = TRUE,
   pValueCutoff = 0.05, verbose = TRUE)
 }
 \arguments{
 \item{tns}{A \linkS4class{TNS} object with regulons used to compute the dual regulons.}
-
-\item{mbr}{An \linkS4class{MBR} object computed from the same 'TNI' object used
-to make the 'TNS' object.}
 
 \item{stepFilter}{A single logical value specifying to use a step-filter 
 algorithm, testing dual regulons that have at least one significant predictor
@@ -46,15 +43,8 @@ stns <- tni2tnsPreprocess(stni, survivalData = survival.data,
 time = 1, event = 2)
 stns <- tnsGSEA2(stns)
 
-# infer dual regulons
-smbr <- tni2mbrPreprocess(stni)
-smbr <- mbrAssociation(smbr)
-
 # run Cox regression for dual regulons
-stns <- tnsCoxInteraction(stns, smbr, stepFilter = FALSE)
+stns <- tnsCoxInteraction(stns, stepFilter = FALSE)
 tnsGet(stns, "coxInteractionTable")
 
-}
-\seealso{
-\code{\link{tni2mbrPreprocess}} for all plot parameters
 }
