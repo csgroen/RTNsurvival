@@ -867,15 +867,9 @@ setMethod("tnsGet", "TNS", function(tns, what)
 #' keycovar = c('Grade','Age'), time = 1, event = 2)
 #' stns <- tnsGSEA2(stns)
 #'
-#' # infer dual regulons
-#' smbr <- tni2mbrPreprocess(stni)
-#' smbr <- mbrAssociation(smbr)
-#'
 #' # survival analysis for dual regulons
-#' # stns <- tnsInteraction(stns, smbr)
+#' # stns <- tnsInteraction(stns)
 #' 
-#' @importClassesFrom RTNduals MBR
-#' @importFrom RTNduals mbrGet
 #' @importFrom survival survdiff survfit coxph Surv
 #' @importFrom stats complete.cases
 #' @docType methods
@@ -898,8 +892,6 @@ setMethod("tnsInteraction", "TNS",
 #' Kaplan-Meier analysis for dual regulons, assessing the interaction between regulons.
 #' 
 #' @param tns A \linkS4class{TNS} object, which must have passed GSEA2 analysis.
-#' @param mbr An \linkS4class{MBR} object computed from the same 'TNI' object used
-#' to make the 'TNS' object.
 #' @param stepFilter A single logical value specifying to use a step-filter 
 #' algorithm, testing dual regulons that have at least one significant predictor
 #' in the 'tnsKM' method (when stepFilter=TRUE) or not (when stepFilter=FALSE).
@@ -920,37 +912,26 @@ setMethod("tnsInteraction", "TNS",
 #' keycovar = c('Grade','Age'), time = 1, event = 2)
 #' stns <- tnsGSEA2(stns)
 #'
-#' # infer dual regulons
-#' smbr <- tni2mbrPreprocess(stni)
-#' smbr <- mbrAssociation(smbr)
-#'
 #' # KM analysis for dual regulons
-#' # stns <- tnsKmInteraction(stns, smbr, stepFilter = FALSE)
+#' # stns <- tnsKmInteraction(stns, stepFilter = FALSE)
 #' # tnsGet(stns, "kmInteractionTable")
 #' 
-#' @importClassesFrom RTNduals MBR
-#' @importFrom RTNduals mbrGet
 #' @importFrom survival survdiff survfit coxph Surv
 #' @importFrom stats complete.cases
+#' @importFrom utils combn
 #' @docType methods
 #' @rdname tnsKmInteraction-methods
 #' @aliases tnsKmInteraction
 #' @export
 #' 
 setMethod("tnsKmInteraction", "TNS", 
-          function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE){
+          function(tns, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE){
             
             #-- checks
             .tns.checks(tns, type = "Activity")
-            .tns.checks(mbr, type = "MBR")
             .tns.checks(stepFilter, type = "stepFilter")
             .tns.checks(pValueCutoff, type = "pValueCutoff")
             .tns.checks(verbose, type = "verbose")
-            
-            #-- check TNIs
-            if(!identical(tnsGet(tns, what = "TNI"), mbrGet(mbr, what = "TNI"))){
-              stop("NOTE: slots 'TNI' must be identical between 'tns' and 'mbr' objects!")
-            }
             
             #-- stratification
             tns <- tnsStratification(tns, nSections = 1, center = TRUE)
@@ -968,12 +949,12 @@ setMethod("tnsKmInteraction", "TNS",
             survData$time[survData$time > endpoint] <- endpoint
             
             #-- get dualregs
-            dualregs <- mbrGet(mbr, what = "dualRegulons")
-            dualtb <- t(sapply(dualregs, function(dual){
-              unlist(strsplit(dual, "~"))
-            }))
+            regs <- names(tnsGet(tns, what = "regulatoryElements"))
+            dualtb <- t(combn(regs,2))
             colnames(dualtb) <- c("reg1","reg2")
             dualtb <- data.frame(dualtb, stringsAsFactors = FALSE)
+            rownames(dualtb) <- paste(dualtb$reg1, dualtb$reg2, sep="~")
+            dualregs <- rownames(dualtb)
             
             #-- apply stepFilter from previous methods
             if(stepFilter){
@@ -986,12 +967,12 @@ setMethod("tnsKmInteraction", "TNS",
               mktb <- mktb[mktb$Adjusted.Pvalue<pValueCutoff, ]
               idx <- dualtb$reg1%in%rownames(mktb) | dualtb$reg2%in%rownames(mktb)
               dualtb <- dualtb[idx,]
+              dualregs <- rownames(dualtb)
               if(nrow(dualtb)==0){
                 message("NOTE: using 'stepFilter=TRUE': no significant regulon from the 'tnsKM' method!",
                         call. = FALSE)
                 return(tns)
               }
-              dualregs <- rownames(dualtb)
             }
             
             if (verbose) {
@@ -1004,7 +985,8 @@ setMethod("tnsKmInteraction", "TNS",
             kmTable <- NULL
             for(dual in dualregs){
               regs <- as.character(dualtb[dual,])
-              res <- .survstatsDuals(regulonActivity, survData=survData, regs=regs, excludeMid=excludeMid)
+              res <- .survstatsDuals(regulonActivity, survData=survData, 
+                                     regs=regs, excludeMid=excludeMid)
               kmFit[[dual]]$survfit <- res$survfit
               kmFit[[dual]]$survdiff <- res$survdiff
               kmTable <- rbind(kmTable,res$kmTable)
@@ -1055,12 +1037,8 @@ setMethod("tnsKmInteraction", "TNS",
 #' keycovar = c('Grade','Age'), time = 1, event = 2)
 #' stns <- tnsGSEA2(stns)
 #' 
-#' # infer dual regulons
-#' smbr <- tni2mbrPreprocess(stni)
-#' smbr <- mbrAssociation(smbr)
-#' 
 #' # KM analysis for dual regulons
-#' # stns <- tnsKmInteraction(stns, smbr, stepFilter=FALSE)
+#' # stns <- tnsKmInteraction(stns, stepFilter=FALSE)
 #' # tnsPlotKmInteraction(stns, dualreg = "FOXM1~PTTG1")
 #' 
 #' @importFrom RColorBrewer brewer.pal
@@ -1137,8 +1115,6 @@ setMethod("tnsPlotKmInteraction", "TNS",
 #' Cox regression analysis for dual regulons, including the interaction term.
 #'
 #' @param tns A \linkS4class{TNS} object with regulons used to compute the dual regulons.
-#' @param mbr An \linkS4class{MBR} object computed from the same 'TNI' object used
-#' to make the 'TNS' object.
 #' @param stepFilter A single logical value specifying to use a step-filter 
 #' algorithm, testing dual regulons that have at least one significant predictor
 #' in the 'tnsCox' method (when stepFilter=TRUE) or not (when stepFilter=FALSE).
@@ -1159,49 +1135,37 @@ setMethod("tnsPlotKmInteraction", "TNS",
 #' stns <- tni2tnsPreprocess(stni, survivalData = survival.data, 
 #' time = 1, event = 2)
 #' stns <- tnsGSEA2(stns)
-#' 
-#' # infer dual regulons
-#' smbr <- tni2mbrPreprocess(stni)
-#' smbr <- mbrAssociation(smbr)
 #'
 #' # run Cox regression for dual regulons
-#' stns <- tnsCoxInteraction(stns, smbr, stepFilter = FALSE)
+#' stns <- tnsCoxInteraction(stns, stepFilter = FALSE)
 #' tnsGet(stns, "coxInteractionTable")
 #'
-#' @seealso \code{\link{tni2mbrPreprocess}} for all plot parameters
 #' @return An updated TNS-class object containing Cox regression models 
 #' for all given duals
-#' @importClassesFrom RTNduals MBR
-#' @importFrom RTNduals mbrGet
+#' @importFrom utils combn
 #' @docType methods
 #' @rdname tnsCoxInteraction-methods
 #' @aliases tnsCoxInteraction
 #' @export
 #' 
 setMethod("tnsCoxInteraction", "TNS",
-          function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, 
+          function(tns, stepFilter = TRUE, pValueCutoff = 0.05, 
                    verbose = TRUE)
           {
             
             #-- checks
             .tns.checks(tns, type = "Activity")
-            .tns.checks(mbr, type = "MBR")
             .tns.checks(stepFilter, type = "stepFilter")
             .tns.checks(pValueCutoff, type = "pValueCutoff")
             .tns.checks(verbose, type = "verbose")
             
-            #-- check TNIs
-            if(!identical(tnsGet(tns, what = "TNI"), mbrGet(mbr, what = "TNI"))){
-              stop("NOTE: slots 'TNI' must be identical between 'tns' and 'mbr' objects!")
-            }
-            
             #-- get dualregs
-            dualregs <- mbrGet(mbr, what = "dualRegulons")
-            dualtb <- t(sapply(dualregs, function(dual){
-              unlist(strsplit(dual, "~"))
-            }))
+            regs <- names(tnsGet(tns, what = "regulatoryElements"))
+            dualtb <- t(combn(regs,2))
             colnames(dualtb) <- c("reg1","reg2")
             dualtb <- data.frame(dualtb, stringsAsFactors = FALSE)
+            rownames(dualtb) <- paste(dualtb$reg1, dualtb$reg2, sep="~")
+            dualregs <- rownames(dualtb)
             
             #-- apply stepFilter from previous methods
             if(stepFilter){
@@ -1235,7 +1199,7 @@ setMethod("tnsCoxInteraction", "TNS",
             survData$event[survData$time > endpoint] <- 0
             survData$time[survData$time > endpoint] <- endpoint
             
-            #-- mbr vs tns checks
+            #-- check dualtb with regulonActivity
             tns.regs <- colnames(regulonActivity$dif)
             if (!all(dualtb$reg1 %in% tns.regs) | !all(dualtb$reg2 %in% tns.regs)) {
               idx1 <- which(dualtb$reg1 %in% tns.regs)
@@ -1322,7 +1286,6 @@ setMethod("tnsCoxInteraction", "TNS",
             res <- list(Table=coxTable, Fit=coxFit)
             tns <- tns.set(tns, res, "CoxInt")
             return(tns)
-            
           })
 
 #' Plot results from Cox regression analysis for dual regulons
@@ -1366,19 +1329,14 @@ setMethod("tnsCoxInteraction", "TNS",
 #' # perform survival analysis for regulons
 #' stns <- tni2tnsPreprocess(stni, survivalData = survival.data, time = 1, event = 2)
 #' stns <- tnsGSEA2(stns, verbose=FALSE)
-#' 
-#' # infer dual regulons
-#' smbr <- tni2mbrPreprocess(stni)
-#' smbr <- mbrAssociation(smbr)
 #'
 #' # run Cox regression for dual regulons
-#' # stns <- tnsCoxInteraction(stns, smbr, stepFilter = FALSE)
+#' # stns <- tnsCoxInteraction(stns, stepFilter = FALSE)
 #' # tnsPlotCoxInteraction(stns, dualreg = "FOXM1~PTTG1")
 
 #' @seealso \code{\link{tnsKM}},
 #' \code{\link{tnsCox}}
 #' @return A 3D heatmap plot.
-#' @importClassesFrom RTNduals MBR 
 #' @importFrom RTNduals mbrPlotInteraction
 #' @importFrom survival coxph
 #' @importFrom grDevices col2rgb
@@ -1478,7 +1436,7 @@ setMethod("tnsPlotCoxInteraction", "TNS",
             #----- Coxplot
             if(plotpdf){
               fname <- gsub(".pdf", '',fname, ignore.case = TRUE)
-              fname <- paste(fname,"_",paste(regs,collapse = "_"),sep = "")
+              fname <- paste(fname,plotype,"_",paste(regs,collapse = "_"),sep = "")
             }
             mbrPlotInteraction(model=model, vars=xregs, xlim=xlim, ylim=ylim, zlim=hlim, 
                                xlab=xlab, ylab=ylab, zlab=zlab, zlog=TRUE,

@@ -1,6 +1,12 @@
-\name{RTN-News}
-\title{RTN News}
+\name{RTNsurvival-News}
+\title{RTNsurvival News}
 \encoding{UTF-8}
+
+\section{Version 1.6.0}{
+  \itemize{
+    \item Improved workflow, integration with derivative packages (RTN / RTNduals).
+  }
+}
 
 \section{Version 1.0.0}{
   \itemize{

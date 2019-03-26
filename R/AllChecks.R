@@ -313,27 +313,7 @@
     if(object1@status["Activity"] != "[x]") 
       stop("NOTE: TNS object needs to be evaluated by 'tnsGSEA2' or 'tnsVIPER'!", 
            call. = FALSE)
-  } 
-  else if(type == "MBR"){
-    if(class(object1) != "MBR")
-      stop("'mbr' must be an object of class 'MBR'", call. = FALSE)
-    status <- mbrGet(object1, "status")
-    if(status["Association"] != "[x]") {
-      stop("'mbr' must be evaluated by 'mbrAssociation'", call. = FALSE)
-    }
-  } 
-  else if(type == "dualregs"){
-    if(class(object1) != "character" & !is.null(object1)) {
-      stop("'dualregs' must be a character vector or NULL.", call. = FALSE)
-    }
-    if(!is.null(object1)){
-      duals <- mbrGet(object2, "dualRegulons")
-      if(!all(object1 %in% duals)){
-        stop("All elements of 'dualregs' must be present in the 'mbr' object",
-             call. = FALSE)
-      }
-    }
-  } 
+  }
   else if(type == "CBpal"){
     valid.pals <- c("BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", 
                     "Spectral", "Accent", "Dark2", "Paired", "Pastel1", "Pastel2", 

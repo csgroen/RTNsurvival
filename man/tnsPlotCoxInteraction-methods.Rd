@@ -74,12 +74,8 @@ data(stni, package = "RTN")
 stns <- tni2tnsPreprocess(stni, survivalData = survival.data, time = 1, event = 2)
 stns <- tnsGSEA2(stns, verbose=FALSE)
 
-# infer dual regulons
-smbr <- tni2mbrPreprocess(stni)
-smbr <- mbrAssociation(smbr)
-
 # run Cox regression for dual regulons
-# stns <- tnsCoxInteraction(stns, smbr, stepFilter = FALSE)
+# stns <- tnsCoxInteraction(stns, stepFilter = FALSE)
 # tnsPlotCoxInteraction(stns, dualreg = "FOXM1~PTTG1")
 }
 \seealso{

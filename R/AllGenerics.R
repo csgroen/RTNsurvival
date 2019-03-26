@@ -45,7 +45,7 @@ setGeneric("tnsInteraction",
              standardGeneric("tnsInteraction"), package = "RTNsurvival")
 
 setGeneric("tnsKmInteraction",
-           function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE)
+           function(tns, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE)
              standardGeneric("tnsKmInteraction"), package = "RTNsurvival")
 
 setGeneric("tnsPlotKmInteraction", 
@@ -56,14 +56,14 @@ setGeneric("tnsPlotKmInteraction",
              standardGeneric("tnsPlotKmInteraction"), package = "RTNsurvival")
 
 setGeneric("tnsCoxInteraction",
-           function(tns, mbr, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE) 
+           function(tns, stepFilter = TRUE, pValueCutoff = 0.05, verbose = TRUE) 
              standardGeneric("tnsCoxInteraction"), package = "RTNsurvival")
 
 setGeneric("tnsPlotCoxInteraction",
            function(tns, dualreg, xlim = NULL, ylim = NULL, hlim = NULL, 
                     hcols = c("#008080ff","#d45500ff"), showdata = TRUE, 
                     colorPalette = "bluered", fname = "coxInteraction", 
-                    fpath = ".", width = 5, height = 4, plotype = "3D", plotpdf = FALSE) 
+                    fpath = ".", width = 4.5, height = 4, plotype = "3D", plotpdf = FALSE) 
              standardGeneric("tnsPlotCoxInteraction"), package = "RTNsurvival")
 
 setGeneric("tnsPlotGSEA2",
