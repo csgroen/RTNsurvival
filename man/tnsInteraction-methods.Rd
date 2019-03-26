@@ -35,11 +35,7 @@ stns <- tni2tnsPreprocess(stni, survivalData = survival.data,
 keycovar = c('Grade','Age'), time = 1, event = 2)
 stns <- tnsGSEA2(stns)
 
-# infer dual regulons
-smbr <- tni2mbrPreprocess(stni)
-smbr <- mbrAssociation(smbr)
-
 # survival analysis for dual regulons
-# stns <- tnsInteraction(stns, smbr)
+# stns <- tnsInteraction(stns)
 
 }
