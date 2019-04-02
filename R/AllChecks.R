@@ -307,7 +307,7 @@
         }
     }
     else if (type == "divs") {
-        if (!is.numeric(object1) || !is.null(object1)) {
+        if (!is.numeric(object1) && !is.null(object1)) {
             stop("'divs' must be a numeric vector.")
         }
     }

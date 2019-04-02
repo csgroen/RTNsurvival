@@ -91,6 +91,7 @@ setMethod("tnsPlotCovariates", "TNS",
     regact <- tnsGet(tns, "regulonActivity")$dif
     regstatus <- tnsGet(tns, "regulonActivity")$regstatus
     regstatus <- apply(regstatus, 1:2, as.character)
+    colnames(regstatus) <- colnames(regact)
     survData <- tnsGet(tns, "survivalData")
     
     #-- Get regs
@@ -261,10 +262,10 @@ ggPlotCovariates <- function(reg, plotData, attrib_names, panelHeights, dummyEnc
     p2 <- ggCovariateTracks(plotData_melt, dummyEncode, divs, attrib_names)
     
     #-- Align
-    grid_plot <- ggarrange(p1, p2, nrow = 2, 
+    grid_plot <- suppressWarnings(ggarrange(p1, p2, nrow = 2, 
                            heights = panelHeights, 
                            draw = FALSE,
-                           padding = unit(3, "line"))
+                           padding = unit(3, "line")))
     ggplots <- list(p1, p2)
     
     return(list(grid_plot = grid_plot, ggplots = ggplots))

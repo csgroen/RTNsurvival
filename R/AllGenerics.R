@@ -98,3 +98,7 @@ setGeneric("tnsPlotSRE",
                     markEnriched = FALSE, ...)
                standardGeneric("tnsPlotSRE"), package = "RTNsurvival")
 
+setGeneric("tnsSRD",
+           function(tns, subgroup, pValueCutoff = 0.05, pAdjustMethod = "BH", 
+                    regs = NULL, verbose = TRUE)
+               standardGeneric("tnsSRD"), package = "RTNsurvival")

@@ -835,11 +835,16 @@ setMethod("tnsGet", "TNS", function(tns, what)
     return(tns@TNI@regulatoryElements)
   } else if(what == "status"){
     return(tns@status)
+  } else if(what == "regulonEnrichment") {
+      return(tns@results$subgroupEnrichment)
+  } else if (what == "regulonDifference") {
+      return(tns@results$subgroupDifference)
   } else {
     stop("'what' must be one of:\n",
          "'status', 'survivalData', 'regulonActivity', 'TNI', 'para','kmTable', 'kmFit',\n",
          "'coxTable', 'coxFit', 'kmInteractionTable', 'kmInteractionFit',\n",
-         "'coxInteractionTable', 'coxInteractionFit', and 'regulatoryElements'.")
+         "'coxInteractionTable', 'coxInteractionFit', 'regulonEnrichment', \n",
+         "'regulonDifference' and 'regulatoryElements'.")
   }
 })
 

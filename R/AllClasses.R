@@ -26,6 +26,8 @@ setClassUnion("charnull", members = c("character", "NULL"))
 #' @method tnsPlotCoxInteraction \code{\link{tnsPlotCoxInteraction}}
 #' @method tnsPlotGSEA2 \code{\link{tnsPlotGSEA2}}
 #' @method tnsAREA3 \code{\link{tnsAREA3}}
+#' @method tnsSRE \code{\link{tnsSRE}}
+#' @method tnsSRE \code{\link{tnsSRD}}
 #' @aliases TNS
 #' 
 #' @section Constructor:
